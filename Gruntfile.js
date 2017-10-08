@@ -31,7 +31,9 @@ module.exports = function(grunt) {
               'images/*',
               'templates/*',
               'README.md',
-              '*.php'
+              '*.php',
+              'vendor/*',
+              'vendor/**/*'
             ],
             dest: 'gitlab-issue-board'
           }, // includes files in path
