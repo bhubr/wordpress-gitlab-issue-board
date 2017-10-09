@@ -1,10 +1,10 @@
 <?php
 
-function wpgli_slug_get_post_meta_cb( $object, $field_name, $request ) {
+function wpglib_slug_get_post_meta_cb( $object, $field_name, $request ) {
 	return get_post_meta( $object[ 'id' ], $field_name, true );
 }
 
-function wpgli_slug_update_post_meta_cb( $value, $object, $field_name ) {
+function wpglib_slug_update_post_meta_cb( $value, $object, $field_name ) {
 	return update_post_meta( $object->ID, $field_name, $value );
 }
 
@@ -88,39 +88,39 @@ class WP_Gitlab_Issue_Board_Types {
 		register_rest_field( 'project',
 			'gl_pid',
 			array(
-			   'get_callback'    => 'wpgli_slug_get_post_meta_cb',
-			   'update_callback' => 'wpgli_slug_update_post_meta_cb',
+			   'get_callback'    => 'wpglib_slug_get_post_meta_cb',
+			   'update_callback' => 'wpglib_slug_update_post_meta_cb',
 			   'schema'          => null,
 			)
 		);
 		register_rest_field( 'issue',
 			'gl_id',
 			array(
-			   'get_callback'    => 'wpgli_slug_get_post_meta_cb',
-			   'update_callback' => 'wpgli_slug_update_post_meta_cb',
+			   'get_callback'    => 'wpglib_slug_get_post_meta_cb',
+			   'update_callback' => 'wpglib_slug_update_post_meta_cb',
 			   'schema'          => null,
 			)
 		);
 		register_rest_field( 'issue',
 			'gl_iid',
 			array(
-			   'get_callback'    => 'wpgli_slug_get_post_meta_cb',
-			   'update_callback' => 'wpgli_slug_update_post_meta_cb',
+			   'get_callback'    => 'wpglib_slug_get_post_meta_cb',
+			   'update_callback' => 'wpglib_slug_update_post_meta_cb',
 			   'schema'          => null,
 			)
 		);
 		register_rest_field( 'issue',
 			'gl_pid',
 			array(
-			   'get_callback'    => 'wpgli_slug_get_post_meta_cb',
-			   'update_callback' => 'wpgli_slug_update_post_meta_cb',
+			   'get_callback'    => 'wpglib_slug_get_post_meta_cb',
+			   'update_callback' => 'wpglib_slug_update_post_meta_cb',
 			   'schema'          => null,
 			)
 		);
 		register_rest_field( 'issue',
 			'gl_state',
 			array(
-			   'get_callback'    => 'wpgli_slug_get_post_meta_cb',
+			   'get_callback'    => 'wpglib_slug_get_post_meta_cb',
 			   'update_callback' => [$this, 'wpgli_update_state_meta_cb'],
 			   'schema'          => null,
 			)
@@ -128,16 +128,16 @@ class WP_Gitlab_Issue_Board_Types {
 		register_rest_field( 'issue',
 			'priority',
 			array(
-			   'get_callback'    => 'wpgli_slug_get_post_meta_cb',
-			   'update_callback' => 'wpgli_slug_update_post_meta_cb',
+			   'get_callback'    => 'wpglib_slug_get_post_meta_cb',
+			   'update_callback' => 'wpglib_slug_update_post_meta_cb',
 			   'schema'          => null,
 			)
 		);
 		register_rest_field( 'issue',
 			'percent_done',
 			array(
-			   'get_callback'    => 'wpgli_slug_get_post_meta_cb',
-			   'update_callback' => 'wpgli_slug_update_post_meta_cb',
+			   'get_callback'    => 'wpglib_slug_get_post_meta_cb',
+			   'update_callback' => 'wpglib_slug_update_post_meta_cb',
 			   'schema'          => null,
 			)
 		 );
@@ -189,6 +189,15 @@ class WP_Gitlab_Issue_Board_Types {
 	}
 
 
+	public function has_existing_project( $project_id ) {
+		$posts = get_posts( array(
+			'post_type' => 'project',
+			'post_guid' => $project_id
+		) );
+		return ! empty( $posts );
+	}
+
+
 	public function sync_projects_gitlab_to_wpdb() {
 		$client = WP_Gitlab_Issue_Board_API_Client::get_instance();
 		$projects = $client->get_all_of_type( 'project' );
@@ -197,13 +206,15 @@ class WP_Gitlab_Issue_Board_Types {
 		foreach( $projects as $project ) {
 
 			$project_id = $project['id'];
-			if( $this->has_post_by_meta( 'project', 'gl_pid', $project_id ) ) {
+			// if( $this->has_post_by_meta( 'project', 'gl_pid', $project_id ) ) {
+			if( $this->has_existing_project( $project_id ) ) {
 				continue;
 			}
 
 			$post = array(
 				'post_type'     => 'project',
 				'post_status'   => 'publish',
+				'post_guid'     => $project_id,
 				'post_title'    => $project['path_with_namespace'],
 				'post_date'   => $project['created_at']
 			);
@@ -213,7 +224,7 @@ class WP_Gitlab_Issue_Board_Types {
 				die("could not create post");
 			}
 
-			update_post_meta( $id, 'gl_pid', $project_id );
+			// update_post_meta( $id, 'gl_pid', $project_id );
 
 		}
 		$project_posts = get_posts( [ 'post_type' => 'project' ] );
