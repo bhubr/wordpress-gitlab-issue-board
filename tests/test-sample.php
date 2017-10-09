@@ -65,7 +65,7 @@ class SampleTest extends WP_UnitTestCase {
 
 	// function test_plugin() {
 		// $faker = Faker\Factory::create();
-		// $client_wrapper = WP_Gitlab_Issue_Board_API_Client::get_instance();
+		// $client_wrapper = Gitlab_Issue_Board_API_Client::get_instance();
 		// $client_wrapper->set_domain( GITLAB_DOMAIN );
 		// $client_wrapper->set_access_token( GITLAB_ACCESS_TOKEN );
 		// $client_wrapper->init_gitlab_client();

@@ -1,5 +1,8 @@
 <?php
-class WP_Gitlab_Issue_Board_Notifier {
+
+namespace bhubr\wp;
+
+class Gitlab_Issue_Board_Notifier {
 
 	private $notice = array();
 
@@ -29,7 +32,7 @@ class WP_Gitlab_Issue_Board_Notifier {
 	 */
 	public static function get_instance() {
 	  if( is_null( self::$_instance ) ) {
-		  self::$_instance = new WP_Gitlab_Issue_Board_Notifier();
+		  self::$_instance = new Gitlab_Issue_Board_Notifier();
 	  }
 	  return self::$_instance;
 	}

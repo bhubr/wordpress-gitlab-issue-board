@@ -1,5 +1,8 @@
 <?php
-class WP_Gitlab_Issue_Board_API_Client {
+
+namespace bhubr\wp;
+
+class Gitlab_Issue_Board_API_Client {
 
 	/**
 	 * @var Singleton
@@ -33,13 +36,17 @@ class WP_Gitlab_Issue_Board_API_Client {
 	 */
 	public static function get_instance() {
 	  if( is_null( self::$_instance ) ) {
-		  self::$_instance = new WP_Gitlab_Issue_Board_API_Client();
+		  self::$_instance = new Gitlab_Issue_Board_API_Client();
 	  }
 	  return self::$_instance;
 	}
 
 
 	public function get_client() {
+		if( ! $this->client ) {
+			$this->init_gitlab_client();
+		}
+
 		return $this->client;
 	}
 

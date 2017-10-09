@@ -1,5 +1,8 @@
 <?php
-class WP_Gitlab_Issue_Board_Configurator {
+
+namespace bhubr\wp;
+
+class Gitlab_Issue_Board_Configurator {
 
 	const ACCOUNT_NOT_READY_NO_CONFIG = 0;
 	const ACCOUNT_NOT_READY_HAS_CONFIG = 1;
@@ -21,13 +24,18 @@ class WP_Gitlab_Issue_Board_Configurator {
 	/**
 	 * Account status (internal). Can take one of the 3 const values above
 	 */
-	private $account_status;
+	private $account_status = self::ACCOUNT_NOT_READY_NO_CONFIG;
 
 
 	/**
 	 * Account data
 	 */
 	private $gitlab_account_data = array();
+
+
+	private $domain = '';
+
+	private $host = '';
 
 
 	/**
@@ -60,9 +68,14 @@ class WP_Gitlab_Issue_Board_Configurator {
 	 */
 	public static function get_instance() {
 	  if( is_null( self::$_instance ) ) {
-		  self::$_instance = new WP_Gitlab_Issue_Board_Configurator();
+		  self::$_instance = new Gitlab_Issue_Board_Configurator();
 	  }
 	  return self::$_instance;
+	}
+
+
+	public function get_account_status() {
+		return $this->account_status;
 	}
 
 
@@ -86,13 +99,9 @@ class WP_Gitlab_Issue_Board_Configurator {
 	 * Check if the user has an app set up and token/user data
 	 */
 	public function check_user_config_and_account() {
-		// var_dump(REST_REQUEST );
-		// echo "check config" . ( is_admin() ? 'true':'false') . ', ' . (is_user_logged_in() ? 'true':'false') . ', ' . ( current_user_can( 'manage_options' )? 'true':'false');
 		if( ! is_user_logged_in() || ! current_user_can( 'manage_options' ) ) {
-		// if( ! is_admin() || ! is_user_logged_in() || ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
-		// echo 'entered';
 		$this->user = wp_get_current_user();
 
 		// We store all the user's config in a single, serialized user meta
@@ -106,12 +115,13 @@ class WP_Gitlab_Issue_Board_Configurator {
 		}
 		else {
 			$this->account_status = isset( $this->gitlab_account_data['data'] ) ?
-				$this->account_status = self::ACCOUNT_READY :
-				$this->account_status = self::ACCOUNT_NOT_READY_HAS_CONFIG;
+				self::ACCOUNT_READY : self::ACCOUNT_NOT_READY_HAS_CONFIG;
+			if( $this->is_ready() ) {
+				$this->set_domain( $this->gitlab_account_data['config']['domain'] );
+				$domain_parsed = parse_url( $this->domain );
+				$this->set_host( $domain_parsed['host'] );
+			}
 		}
-		// var_dump($this->user);
-		// var_dump($this->gitlab_account_data);
-		// var_dump($this->get_access_token());
 	}
 
 
@@ -142,15 +152,25 @@ class WP_Gitlab_Issue_Board_Configurator {
 	 * Get GitLab domain
 	 */
 	public function get_domain() {
-		if(
-			empty( $this->gitlab_account_data ) ||
-			! is_array( $this->gitlab_account_data ) ||
-			! isset( $this->gitlab_account_data['config'] ) ||
-			! isset( $this->gitlab_account_data['config']['domain'] )
-		) {
-			throw new Exception( 'Could not find domain in account config' );
-		}
-		return $this->gitlab_account_data['config']['domain'];
+		return $this->domain;
+	}
+
+	public function set_domain( $domain ) {
+		$this->domain = $domain;
+	}
+
+	/**
+	 * Get GitLab host
+	 */
+	public function get_host() {
+		return $this->host;
+	}
+
+	/**
+	 * Get GitLab host
+	 */
+	public function set_host( $host ) {
+		$this->host = $host;
 	}
 
 	/**

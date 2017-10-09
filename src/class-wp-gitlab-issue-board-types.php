@@ -1,5 +1,7 @@
 <?php
 
+namespace bhubr\wp;
+
 function wpglib_slug_get_post_meta_cb( $object, $field_name, $request ) {
 	return get_post_meta( $object[ 'id' ], $field_name, true );
 }
@@ -9,19 +11,9 @@ function wpglib_slug_update_post_meta_cb( $value, $object, $field_name ) {
 	return update_post_meta( $object->ID, $field_name, $value );
 }
 
-function update_meta_gitlab_project_id( $value, $object, $field_name ) {
-	throw new Exception( 'should not attempt to update project id' );
-}
 
-function get_meta_gitlab_project_id(  $object, $field_name, $request ) {
-	global $wpdb;
-	$query = $wpdb->prepare( "SELECT comment_count FROM {$wpdb->prefix}posts WHERE ID=%d", $object['id'] );
-	$results = $wpdb->get_results( $query, OBJECT );
-	$result = array_pop( $results );
-	return (int) $result->comment_count;
-}
 
-class WP_Gitlab_Issue_Board_Types {
+class Gitlab_Issue_Board_Types {
 
 	/**
 	 * @var Singleton
@@ -37,18 +29,9 @@ class WP_Gitlab_Issue_Board_Types {
 	private function __construct() {
 
 		add_action( 'init', array( $this, 'register_types' ) );
-		add_action( 'rest_api_init', array( $this, 'register_rest_fields' ) );
-		//The Following registers an api route with multiple parameters. 
-		add_action( 'rest_api_init', array( $this, 'add_custom_routes' ) );
+
 
 		// THIS is GOOD. Remove bloody auto <p> insertion for my plugin's CPTs. Take that WP!!
-		add_action('the_content', function( $content ) {
-			global $post;
-			if( array_search( $post->post_type, ['project', 'issue'] ) !== false ) {
-				remove_action( 'the_content', 'wpautop' );
-			}
-			return $content;
-		}, 8);
 
 		 
 	}
@@ -62,121 +45,18 @@ class WP_Gitlab_Issue_Board_Types {
 	 */
 	public static function get_instance() {
 	  if( is_null( self::$_instance ) ) {
-		  self::$_instance = new WP_Gitlab_Issue_Board_Types();
+		  self::$_instance = new Gitlab_Issue_Board_Types();
 	  }
 	  return self::$_instance;
 	}
 
 
-	/**
-	 * Register types for the app
-	 */
-	public function register_types() {
-	   register_post_type('project', [
-			'labels'       => [
-				'name'     => 'Projects',
-			],
-			'supports'     => [ 'title', 'editor', 'thumbnail' ],
-			'show_ui'      => true,
-			'show_in_rest' => true
-		]);
-	   register_post_type('issue', [
-			'labels'       => [
-				'name'     => 'Issues',
-			],
-			'supports'     => [ 'title', 'editor', 'thumbnail' ],
-			'show_ui'      => true,
-			'show_in_rest' => true
-		]);
-	   register_taxonomy('issue_label', 'issue', [
-			'labels'       => [
-				'name'     => 'Issue labels',
-			],
-			'hierarchical' => false,
-			'show_ui'      => true,
-			'show_in_rest' => true
-		]);
-	   register_taxonomy('issue_cat', 'issue', [
-			'labels'       => [
-				'name'     => 'Issue categories',
-			],
-			'hierarchical' => true,
-			'show_ui'      => true,
-			'show_in_rest' => true
-		]);
-	}
 
 
-	public function register_rest_fields() {
-		register_rest_field( 'project',
-			'gl_project_id',
-			array(
-			   'get_callback'    => 'get_meta_gitlab_project_id',
-			   'update_callback' => null, //'update_meta_gitlab_project_id',
-			   'schema'          => null,
-			)
-		);
-		register_rest_field( 'issue',
-			'gl_id',
-			array(
-			   'get_callback'    => 'wpglib_slug_get_post_meta_cb',
-			   'update_callback' => 'wpglib_slug_update_post_meta_cb',
-			   'schema'          => null,
-			)
-		);
-		register_rest_field( 'issue',
-			'gl_iid',
-			array(
-			   'get_callback'    => 'wpglib_slug_get_post_meta_cb',
-			   'update_callback' => 'wpglib_slug_update_post_meta_cb',
-			   'schema'          => null,
-			)
-		);
-		register_rest_field( 'issue',
-			'gl_pid',
-			array(
-			   'get_callback'    => 'wpglib_slug_get_post_meta_cb',
-			   'update_callback' => 'wpglib_slug_update_post_meta_cb',
-			   'schema'          => null,
-			)
-		);
-		register_rest_field( 'issue',
-			'gl_state',
-			array(
-			   'get_callback'    => 'wpglib_slug_get_post_meta_cb',
-			   'update_callback' => [$this, 'wpgli_update_state_meta_cb'],
-			   'schema'          => null,
-			)
-		);
-		register_rest_field( 'issue',
-			'priority',
-			array(
-			   'get_callback'    => 'wpglib_slug_get_post_meta_cb',
-			   'update_callback' => 'wpglib_slug_update_post_meta_cb',
-			   'schema'          => null,
-			)
-		);
-		register_rest_field( 'issue',
-			'percent_done',
-			array(
-			   'get_callback'    => 'wpglib_slug_get_post_meta_cb',
-			   'update_callback' => 'wpglib_slug_update_post_meta_cb',
-			   'schema'          => null,
-			)
-		 );
-	}
+	
 
 
-	public function add_custom_routes(){
-	    register_rest_route( 'wpglib/v1', '/sync-projects', array(
-	        'methods' => 'POST',
-	        'callback' => array( $this, 'sync_projects_gitlab_to_wpdb' ),
-	    ));
-	    register_rest_route( 'wpglib/v1', '/sync-issues', array(
-	        'methods' => 'POST',
-	        'callback' => array( $this, 'sync_issues_gitlab_to_wpdb' ),
-	    ));
-	}
+
 
 
 	private function has_post_by_meta( $post_type, $key, $val ) {
@@ -212,25 +92,12 @@ class WP_Gitlab_Issue_Board_Types {
 	}
 
 
-	public function has_existing_project( $post_title ) {
-		$posts = get_posts( array(
-			'post_type' => 'project',
-			'guid' => site_url() . $project_id
-		) );
-		return ! empty( $posts );
-	}
-
-
-	public function import_projects( $projects ) {
-		
-	}
-
 
 	public function sync_projects_gitlab_to_wpdb() {
 
 		// 1. get projects
 		// 2. inject them in db
-		$client = WP_Gitlab_Issue_Board_API_Client::get_instance();
+		$client = Gitlab_Issue_Board_API_Client::get_instance();
 		try {
 			$projects = $client->get_all_projects();
 		} catch( Exception $e ) {
@@ -313,7 +180,7 @@ class WP_Gitlab_Issue_Board_Types {
 		$body = $request->get_json_params();
 		$project_post_id = (int)$body['post_id'];
 		$gitlab_pid = (int)get_post_meta( $project_post_id, 'gl_pid', true );
-		$client = WP_Gitlab_Issue_Board_API_Client::get_instance();
+		$client = Gitlab_Issue_Board_API_Client::get_instance();
 		$issues = $client->get_all_of_type( 'issue', array(
 			'gl_pid' => $gitlab_pid
 		) );

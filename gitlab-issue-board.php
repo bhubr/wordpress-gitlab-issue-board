@@ -10,13 +10,21 @@
  License URI: https://www.gnu.org/licenses/gpl-2.0.html
  Text Domain: wpglib
  */
+
+namespace bhubr\wp;
+
+define( 'WPGLIB_DEBUG', false );
 require 'vendor/autoload.php';
 require 'src/class-wp-gitlab-issue-board-configurator.php';
 require 'src/class-wp-gitlab-issue-board-notifier.php';
-require 'src/class-wp-gitlab-issue-board-types.php';
+// require 'src/class-wp-gitlab-issue-board-types.php';
 require 'src/class-wp-gitlab-issue-board-client.php';
+require 'src/functions.php';
+require 'src/register-types.php';
+require 'src/rest-setup.php';
+require 'src/wpdb-io-projects.php';
 
-class WP_Gitlab_Issue_Board {
+class Gitlab_Issue_Board {
 
 
 	/**
@@ -58,10 +66,17 @@ class WP_Gitlab_Issue_Board {
 		add_action( 'admin_menu', array( $this, 'register_board_app_page_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'load_board_app_assets' ) );
 
-		$this->configurator = WP_Gitlab_Issue_Board_Configurator::get_instance();
-		$this->notifier = WP_Gitlab_Issue_Board_Notifier::get_instance();
-		$this->types = WP_Gitlab_Issue_Board_Types::get_instance();
-		$this->gitlab_client = WP_Gitlab_Issue_Board_API_Client::get_instance();
+		$this->configurator = Gitlab_Issue_Board_Configurator::get_instance();
+		$this->notifier = Gitlab_Issue_Board_Notifier::get_instance();
+		// $this->types = Gitlab_Issue_Board_Types::get_instance();
+		$this->gitlab_client = Gitlab_Issue_Board_API_Client::get_instance();
+
+		add_action( 'init', '\\bhubr\\wp\\glib\\register_types' );
+		add_action( 'rest_api_init', '\\bhubr\\wp\\glib\\rest\\setup' );
+		if( WP_DEBUG && WPGLIB_DEBUG ) {
+			require 'src/log-startup.php';
+			glib\log_startup();
+		}
 
 		add_action( 'init', function() {
 			if( $this->configurator->is_ready() ) {
@@ -84,7 +99,7 @@ class WP_Gitlab_Issue_Board {
 	 */
 	public static function get_instance() {
 	  if( is_null( self::$_instance ) ) {
-		  self::$_instance = new WP_Gitlab_Issue_Board();
+		  self::$_instance = new Gitlab_Issue_Board();
 	  }
 	  return self::$_instance;
 	}
@@ -160,4 +175,4 @@ class WP_Gitlab_Issue_Board {
 }
 
 // Instantiate the plugin
-$plugin = WP_Gitlab_Issue_Board::get_instance();
+$plugin = Gitlab_Issue_Board::get_instance();
