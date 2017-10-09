@@ -3,8 +3,8 @@
 <p class="board-welcome">{{ $ctrl.message }}</p>
 
 <button ng-click="$ctrl.syncProjects()">sync projects</button>
-<ul>
-  <li ng-repeat="p in $ctrl.projects">{{ p.id }} - {{ p.gl_pid }} - {{ p.title.rendered }} <a href="#" ng-click="$ctrl.syncIssues(p.id)">sync</a></li>
+<ul class="synced-projects-list">
+  <li ng-repeat="p in $ctrl.projects" class="{{ p._changed }}">{{ p.id }} - {{ p.gl_project_id }} - {{ p.title.rendered }} <a href="#" ng-click="$ctrl.syncIssues(p.id)">sync</a></li>
 </ul>
 
 <h3>Issues</h3>

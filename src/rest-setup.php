@@ -102,6 +102,35 @@ function get_meta_gitlab_project_id(  $object, $field_name, $request ) {
 	return (int) $result->comment_count;
 }
 
+function map_wp_post_fields( $record ) {
+	return [
+		'id'            => $record['ID'],
+		'slug'          => $record['post_name'],
+		'type'          => $record['post_type'],
+		'status'        => $record['post_status'],
+		'date'          => $record['post_date'],
+		'date_gmt'      => $record['post_date_gmt'],
+		'modified'      => $record['post_modified'],
+		'modified_gmt'  => $record['post_modified_gmt'],
+		'link'          => get_permalink( $record['ID'] ),
+		'gl_project_id' => $record['comment_count'],
+		'title'         =>  [
+			'rendered'  => $record['post_title']
+		],
+		'content'       => [
+			'rendered'  => $record['post_content']
+		],
+		'guid'          =>  [
+			'rendered'  => $record['guid']
+		],
+		'_changed'      => $record['_changed']
+	];
+}
+
+function map_wp_posts_fields( $records ) {
+	return array_map( '\\bhubr\\wp\\glib\\rest\\map_wp_post_fields', $records );
+}
+
 function sync_gitlab_projects_to_wp() {
 
 	// 1. get projects
@@ -110,13 +139,16 @@ function sync_gitlab_projects_to_wp() {
 	$projects = null;
 	try {
 		$projects = $client->get_all_projects();
+		error_log( 'api client fetched ' . count($projects) . ' projects' );
 	} catch( Exception $e ) {
 		return new \WP_REST_Response( [ 'error' => $e->getMessage() ], 500 );
 	}
 
 	$results = wpdb_io\import_many_projects( $projects );
 
-	return new \WP_REST_Response( $results, 200 );
+	$mapped = map_wp_posts_fields( $results );
+
+	return new \WP_REST_Response( $mapped, 200 );
 }
 
 /**

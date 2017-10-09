@@ -1,7 +1,7 @@
 <?php
 /*
  Plugin Name: GitLab Issue Board
- Version: 0.0.2
+ Version: 0.0.3
  Plugin URI: https://developpeur-web-toulouse.fr/wordpress/gitlab-issue-board/
  Description: Shows a Trello-like GitLab issue board in WordPress dashboard
  Author: Benoît Hubert

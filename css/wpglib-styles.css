@@ -4,3 +4,14 @@
 .issue-new {
   color: #d83;
 }
+.synced-projects-list .deleted {
+  text-decoration: line-through;
+  color: red;
+}
+.synced-projects-list .updated {
+  color: #5b5;
+}
+.synced-projects-list .created {
+  color: #45c;
+  font-weight: bold;
+}

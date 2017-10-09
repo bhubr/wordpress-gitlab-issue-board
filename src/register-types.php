@@ -1,6 +1,7 @@
 <?php
 namespace bhubr\wp\glib;
 
+// We have to restrict access so that only logged-in users can access the data
 function register_types() {
 	register_post_type('project', [
 		'labels'       => [
@@ -8,7 +9,7 @@ function register_types() {
 		],
 		'supports'     => [ 'title', 'editor', 'thumbnail' ],
 		'show_ui'      => true,
-		'show_in_rest' => true
+		'show_in_rest' => is_user_logged_in()
 	]);
 	register_post_type('issue', [
 		'labels'       => [
@@ -16,7 +17,7 @@ function register_types() {
 		],
 		'supports'     => [ 'title', 'editor', 'thumbnail' ],
 		'show_ui'      => true,
-		'show_in_rest' => true
+		'show_in_rest' => is_user_logged_in()
 	]);
 	register_taxonomy('issue_label', 'issue', [
 		'labels'       => [
@@ -24,7 +25,7 @@ function register_types() {
 		],
 		'hierarchical' => false,
 		'show_ui'      => true,
-		'show_in_rest' => true
+		'show_in_rest' => is_user_logged_in()
 	]);
 	register_taxonomy('issue_cat', 'issue', [
 		'labels'       => [
@@ -32,6 +33,6 @@ function register_types() {
 		],
 		'hierarchical' => true,
 		'show_ui'      => true,
-		'show_in_rest' => true
+		'show_in_rest' => is_user_logged_in()
 	]);
 }
