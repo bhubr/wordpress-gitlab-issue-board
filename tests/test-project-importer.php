@@ -36,7 +36,7 @@ class WPDB_IO_Projects_Test extends WP_UnitTestCase {
 
 	function test_project_already_exists_none_before() {
 		$exists = $post_id = wpdb_io\project_already_exists([
-			'id' => 17001,
+			'id' => 17100,
 			'description' => 'lorem ipsum go to hell',
 			'name_with_namespace' => 'Basilisk / pea-brained witch',
 			'web_url' => GITLAB_DOMAIN . '/basilisk/pea-brained-witch'
@@ -46,35 +46,64 @@ class WPDB_IO_Projects_Test extends WP_UnitTestCase {
 
 	function test_project_already_exists_yes_after_import() {
 		$attrs = [
-			'id' => 17002,
+			'id' => 17200,
 			'description' => 'lorem ipsum go to hell',
 			'name_with_namespace' => 'Golum / drunken gorgon',
 			'web_url' => GITLAB_DOMAIN . '/golum/drunken-gorgon'
 		];
 		wpdb_io\import_one_project( $attrs );
-		$exists = $post_id = wpdb_io\project_already_exists( $attrs );
-		$this->assertTrue( $exists );
+		$existing_project = wpdb_io\project_already_exists( $attrs );
+		$this->assertNotEmpty( $existing_project );
 	}
 
 	function test_project_already_exists_yes_after_changing_web_url() {
 		$attrs = [
-			'id' => 17003,
+			'id' => 17300,
 			'description' => 'lorem ipsum go to hell',
 			'name_with_namespace' => 'Gnome / cruel-hearted troll',
 			'web_url' => GITLAB_DOMAIN . '/gnome/cruel-hearted-troll'
 		];
 		wpdb_io\import_one_project( $attrs );
 		$attrs['web_url'] = GITLAB_DOMAIN . '/gnome/cruel-hearted-zombie';
-		$exists = $post_id = wpdb_io\project_already_exists( $attrs );
-		$this->assertTrue( $exists );
+		$existing_project = wpdb_io\project_already_exists( $attrs );
+		$this->assertNotEmpty( $existing_project );
+	}
+
+	function test_compare_project_attributes() {
+		$attrs = [
+			'id' => 17300,
+			'description' => 'lorem ipsum go to hell',
+			'name_with_namespace' => 'Gnome / cruel-hearted troll',
+			'web_url' => GITLAB_DOMAIN . '/gnome/cruel-hearted-troll'
+		];
+		wpdb_io\import_one_project( $attrs );
+		$existing_project = wpdb_io\project_already_exists( $attrs );
+		$new_attrs = [
+			'description' => 'lorem ipsum go to heaven',
+			'name_with_namespace' => 'Gnome / cruel-hearted mountain troll',
+			'web_url' => GITLAB_DOMAIN . '/gnome/cruel-hearted-troll'
+		];
+		$attrs_updated = wpdb_io\compare_project_attributes( $existing_project, $new_attrs );
+		$this->assertEquals( [
+			'post_title' => 'Gnome / cruel-hearted mountain troll',
+			'post_content' => 'lorem ipsum go to heaven'
+		], $attrs_updated );
+	}
+
+	function test_get_set_attributes_query_part() {
+		$set_attrs_part = wpdb_io\get_set_attributes_query_part( [
+			'description' => 'foo',
+			'name_with_namespace' => 'bar'
+		] );
+		$this->assertEquals( "description='%s',name_with_namespace='%s'", $set_attrs_part );
 	}
 
 	/**
 	 * Try importing one project only
 	 */
 	function test_import_one_once() {
-		$post_id = wpdb_io\import_one_project([
-			'id' => 17004,
+		list($post_id, $status) = wpdb_io\import_one_project([
+			'id' => 17400,
 			'description' => 'lorem ipsum go to hell',
 			'name_with_namespace' => 'Spirit / tripping Frankenstein’s monster',
 			'web_url' => GITLAB_DOMAIN . '/spirit/tripping-frankensteins-monster'
@@ -82,7 +111,7 @@ class WPDB_IO_Projects_Test extends WP_UnitTestCase {
 		global $wpdb;
 		$results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}posts WHERE ID={$post_id}", OBJECT );
 		$result = array_pop( $results );
-		$this->assertEquals( 17004, $result->comment_count );
+		$this->assertEquals( 17400, $result->comment_count );
 		$this->assertEquals( 'Spirit / tripping Frankenstein’s monster', $result->post_title );
 		$this->assertEquals( 'lorem ipsum go to hell', $result->post_content );
 		$this->assertEquals( GITLAB_DOMAIN . '/spirit/tripping-frankensteins-monster', $result->guid );
@@ -96,8 +125,8 @@ class WPDB_IO_Projects_Test extends WP_UnitTestCase {
 			'id', 'gl_project_id', 'guid', 'post_title', 'status', 'type', 'slug', 'title', 'content'
 		] );
 		$this->assertEquals( [
-    			'id' => 5,
-    			'gl_project_id' => 17004,
+    			'id' => 6,
+    			'gl_project_id' => 17400,
     			'guid' => [
     				'rendered' => GITLAB_DOMAIN . '/spirit/tripping-frankensteins-monster'
     			],
@@ -121,7 +150,7 @@ class WPDB_IO_Projects_Test extends WP_UnitTestCase {
 	 */
 	function test_import_one_twice_the_same() {
 		$attrs = [
-			'id' => 17005,
+			'id' => 17500,
 			'name_with_namespace' => 'Sea monster / misunderstood yeti',
 			'web_url' => GITLAB_DOMAIN . '/sea-monster/misunderstood-yeti',
 			'description' => 'lorem ipsum go to hell'
@@ -140,18 +169,17 @@ class WPDB_IO_Projects_Test extends WP_UnitTestCase {
 	 */
 	function test_import_one_twice_with_update() {
 		$attrs = [
-			'id' => 17006,
+			'id' => 17600,
 			'name_with_namespace' => 'Imp / bat-shit-crazy ogre',
 			'web_url' => GITLAB_DOMAIN . '/imp/bat-shit-crazy-ogre',
 			'description' => 'lorem ipsum go to hell'
 		];
-		$post_id = wpdb_io\import_one_project( $attrs );
+		list($post_id, $status) = wpdb_io\import_one_project( $attrs );
 		$attrs['description'] = "keep calm and go to hell";
-		$attrs['web_url'] = "https://gitlab.example.com/imp/bat-shit-crazy-ogress";
+		$attrs['web_url'] = GITLAB_DOMAIN . '/imp/bat-shit-crazy-ogress';
 		wpdb_io\import_one_project( $attrs );
 
 		global $wpdb;
-		echo "SELECT * FROM {$wpdb->prefix}posts WHERE ID={$post_id}\n";
 		$results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}posts WHERE ID={$post_id}", OBJECT );
 		$this->assertEquals( 1, count( $results ) );
 		$result = array_pop( $results );
@@ -167,13 +195,13 @@ class WPDB_IO_Projects_Test extends WP_UnitTestCase {
 	function test_import_many() {
 		$seed = [
 			[
-				'id' => 17007,
+				'id' => 17700,
 				'name_with_namespace' => 'Hydra / zombie-like devil',
 				'web_url' => GITLAB_DOMAIN . '/hydra/zombie-like-devil',
 				'description' => 'lorem ipsum go to hell'
 			],
 			[
-				'id' => 17008,
+				'id' => 17800,
 				'name_with_namespace' => 'merman / misunderstood leviathan',
 				'web_url' => GITLAB_DOMAIN . '/merman/misunderstood-leviathan',
 				'description' => 'lorem ipsum go to hell'
