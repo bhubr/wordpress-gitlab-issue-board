@@ -155,6 +155,7 @@ class WP_Gitlab_Issue_Board_Types {
 		   )
 		);
 		$query = new WP_Query($args);
+		// var_dump($query->get_queried_object_id());
 		return $query->have_posts();
 	}
 
@@ -162,6 +163,7 @@ class WP_Gitlab_Issue_Board_Types {
 	public function sync_projects_gitlab_to_wpdb() {
 		$client = WP_Gitlab_Issue_Board_API_Client::get_instance();
 		$projects = $client->get_all_of_type( 'project' );
+		$new_project_ids = array();
 
 		foreach( $projects as $project ) {
 
@@ -177,6 +179,7 @@ class WP_Gitlab_Issue_Board_Types {
 				'post_date'   => $project['created_at']
 			);
 			$id = wp_insert_post( $post );
+			$new_project_ids[] = $id;
 			if( ! $id ) {
 				die("could not create post");
 			}
@@ -185,9 +188,15 @@ class WP_Gitlab_Issue_Board_Types {
 
 		}
 		$project_posts = get_posts( [ 'post_type' => 'project' ] );
-		$project_ids = array_map( function( $proj_post ) {
-			return $proj_post->ID;
-		},  $project_posts );
+		$data = array_map( function( $post ) use( $new_project_ids ) {
+			return array(
+				'id' => $post->ID,
+				'title' => array( 'rendered' => $post->post_title ),
+				'gl_pid' => get_post_meta( $post->ID, 'gl_pid', true ),
+				'new' => array_search( $post->ID, $new_project_ids ) !== false
+			);
+		}, $project_posts );
+		die( json_encode( $data ) );
 	}
 
 

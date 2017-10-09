@@ -114,7 +114,10 @@ function DataService($rootScope, $http, $q, _) {
       headers: {
         'X-WP-Nonce': wpApiSettings.nonce
       }
-    });
+    })
+    .then(function(response) {
+      return response.data;
+    });;
   }
 
   function getIssues() {

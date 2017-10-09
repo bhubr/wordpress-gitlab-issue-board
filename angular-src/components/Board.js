@@ -7,6 +7,7 @@ function BoardController($rootScope, $http, $timeout, _, dataService) {
   $ctrl.syncProjects = function() {
     dataService.syncProjects()
     .then(function(projects) {
+      console.log('got projects', projects);
       $ctrl.projects = projects;
     });
   }
