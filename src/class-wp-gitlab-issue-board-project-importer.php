@@ -8,19 +8,29 @@ class WP_Gitlab_Issue_Board_Project_Importer {
 	 *  - guid (should be the web URL e.g. http://gitlab.example.com/root/shivering-raven-spirit)
 	 *  - comment_count (bigint 20, ok for storing GitLab IDs)
 	 */
-	public function already_exists( $project ) {
-		$posts = get_posts( array(
-			'post_type' => 'project',
-			'guid' => site_url() . $project_id
-		) );
-		return ! empty( $posts );
+	public static function already_exists( $project ) {
+		global $wpdb;
+		$query = $wpdb->prepare(
+			"SELECT ID FROM {$wpdb->prefix}posts WHERE comment_count=%d AND guid='%s'",
+			$project['id'], $project['web_url']
+		);
+		$results = $wpdb->get_results( $query, OBJECT );
+		return ! empty( $results );
 	}
 
+
+	/**
+	 * Inject a project into db if it does not exist
+	 */
 	public static function import_one( $project ) {
+		if( self::already_exists( $project ) ) {
+			return false;
+		}
 		$id = wp_insert_post( [
 			'post_type'     => 'project',
 			'post_status'   => 'publish',
 			'post_title'    => $project['name_with_namespace'],
+			'post_content'  => $project['description'],
 			'guid'          => $project['web_url']
 		] );
 		global $wpdb;
@@ -29,8 +39,38 @@ class WP_Gitlab_Issue_Board_Project_Importer {
 		return $id;
 	}
 
-	public function import_many( $projects ) {
+
+	/**
+	 * Import several projects
+	 */
+	public static function import_many( $projects ) {
+
+		// Will help us sort out the new projects from the old
+		$new_project_ids = [];
 		
+		foreach( $projects as $project ) {
+
+			$id_or_false = self::import_one( $projects );
+			if( $id_or_false ) {
+				$new_project_ids[] = $id_or_false;
+			}
+
+		}
+
+		$all_projects = self::query_all();
+		foreach ( $all_projects as $p ) {
+			$p['_is_new'] = array_search( $p->ID, $new_project_ids ) !== false;
+		}
+
+	}
+
+
+	public static function query_all() {
+		global $wpdb;
+		$results = $wpdb->get_results(
+			"SELECT * FROM {$wpdb->prefix}posts WHERE post_type='project'", ARRAY_A
+		);
+		return $results;
 	}
 
 

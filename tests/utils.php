@@ -21,7 +21,7 @@ function remove_all_projects() {
     $api = $client->api('projects');
     $projects = $pager->fetchAll($api, 'all');
     // $result = $pager->fetch($api, 'all');
-    var_dump(count( $result) );
+    // var_dump(count( $result) );
 	foreach( $projects as $p ) {
 		$client->projects()->remove( $p['id'] );
 	}
@@ -40,4 +40,14 @@ function fake_n_projects( $n ) {
 			)
 		);
 	}
+}
+
+function pick_array_keys( $array, $keys ) {
+	$output = [];
+	foreach( $keys as $k ) {
+		if( isset( $array[ $k ] ) ) {
+			$output[ $k ] = $array[ $k ];
+		}
+	}
+	return $output;
 }

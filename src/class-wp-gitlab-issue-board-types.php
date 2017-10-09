@@ -40,6 +40,16 @@ class WP_Gitlab_Issue_Board_Types {
 		add_action( 'rest_api_init', array( $this, 'register_rest_fields' ) );
 		//The Following registers an api route with multiple parameters. 
 		add_action( 'rest_api_init', array( $this, 'add_custom_routes' ) );
+
+		// THIS is GOOD. Remove bloody auto <p> insertion for my plugin's CPTs. Take that WP!!
+		add_action('the_content', function( $content ) {
+			global $post;
+			if( array_search( $post->post_type, ['project', 'issue'] ) !== false ) {
+				remove_action( 'the_content', 'wpautop' );
+			}
+			return $content;
+		}, 8);
+
 		 
 	}
 
@@ -102,7 +112,7 @@ class WP_Gitlab_Issue_Board_Types {
 			'gl_project_id',
 			array(
 			   'get_callback'    => 'get_meta_gitlab_project_id',
-			   'update_callback' => 'update_meta_gitlab_project_id',
+			   'update_callback' => null, //'update_meta_gitlab_project_id',
 			   'schema'          => null,
 			)
 		);

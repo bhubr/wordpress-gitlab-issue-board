@@ -55,7 +55,6 @@ class WP_Gitlab_Issue_Board {
 	 * Constructor: plug WordPress hooks
 	 */
 	private function __construct() {
-
 		add_action( 'admin_menu', array( $this, 'register_board_app_page_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'load_board_app_assets' ) );
 
