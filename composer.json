@@ -1,5 +1,7 @@
 {
     "require": {
-        "omines/oauth2-gitlab": "^3.0"
+        "omines/oauth2-gitlab": "^3.0",
+        "m4tthumphrey/php-gitlab-api": "^9.4",
+        "php-http/guzzle6-adapter": "^1.1"
     }
 }

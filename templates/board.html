@@ -1,3 +1,8 @@
 <h4>Board</h4>
 
 <p class="board-welcome">{{ $ctrl.message }}</p>
+
+<button ng-click="$ctrl.syncProjects()">sync projects</button>
+<ul>
+  <li ng-each="p in $ctrl.projects">{{ p.title.rendered }}</li>
+</ul>

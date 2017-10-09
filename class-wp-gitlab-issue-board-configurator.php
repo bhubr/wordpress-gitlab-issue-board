@@ -86,9 +86,13 @@ class WP_Gitlab_Issue_Board_Configurator {
 	 * Check if the user has an app set up and token/user data
 	 */
 	public function check_user_config_and_account() {
-		if( ! is_admin() || ! is_user_logged_in() || ! current_user_can( 'manage_options' ) ) {
+		// var_dump(REST_REQUEST );
+		// echo "check config" . ( is_admin() ? 'true':'false') . ', ' . (is_user_logged_in() ? 'true':'false') . ', ' . ( current_user_can( 'manage_options' )? 'true':'false');
+		if( ! is_user_logged_in() || ! current_user_can( 'manage_options' ) ) {
+		// if( ! is_admin() || ! is_user_logged_in() || ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
+		// echo 'entered';
 		$this->user = wp_get_current_user();
 
 		// We store all the user's config in a single, serialized user meta
@@ -105,6 +109,9 @@ class WP_Gitlab_Issue_Board_Configurator {
 				$this->account_status = self::ACCOUNT_READY :
 				$this->account_status = self::ACCOUNT_NOT_READY_HAS_CONFIG;
 		}
+		// var_dump($this->user);
+		// var_dump($this->gitlab_account_data);
+		// var_dump($this->get_access_token());
 	}
 
 
@@ -113,6 +120,22 @@ class WP_Gitlab_Issue_Board_Configurator {
 	 */
 	public function is_ready() {
 		return $this->account_status === self::ACCOUNT_READY;
+	}
+
+
+	/**
+	 * Get GitLab API access token
+	 */
+	public function get_access_token() {
+		if(
+			empty( $this->gitlab_account_data ) ||
+			! is_array( $this->gitlab_account_data ) ||
+			! isset( $this->gitlab_account_data['data'] ) ||
+			! isset( $this->gitlab_account_data['data']['accessToken'] )
+		) {
+			throw new Exception( 'Could not find access token in account data' );
+		}
+		return $this->gitlab_account_data['data']['accessToken'];
 	}
 
 	/**

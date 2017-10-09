@@ -18,7 +18,14 @@ function UIRouterConfig(
     {
       name: 'board',
       url: '/',
-      component: 'board'
+      component: 'board',
+      resolve: {
+        projects: [
+          'dataService', function(dataService) {
+            return dataService.getProjects();
+          }
+        ]
+      }
     },
     {
       name: 'tools',

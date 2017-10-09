@@ -13,6 +13,8 @@
 require 'vendor/autoload.php';
 require 'class-wp-gitlab-issue-board-configurator.php';
 require 'class-wp-gitlab-issue-board-notifier.php';
+require 'class-wp-gitlab-issue-board-types.php';
+require 'class-wp-gitlab-issue-board-client.php';
 
 class WP_Gitlab_Issue_Board {
 
@@ -27,6 +29,18 @@ class WP_Gitlab_Issue_Board {
 	 * Notifier
 	 */
 	private $notifier = null;
+
+
+	/**
+	 * Types
+	 */
+	private $types = null;
+
+
+	/**
+	 * GitLab Client
+	 */
+	private $gitlab_client = null;
 
 
 	/**
@@ -47,7 +61,18 @@ class WP_Gitlab_Issue_Board {
 
 		$this->configurator = WP_Gitlab_Issue_Board_Configurator::get_instance();
 		$this->notifier = WP_Gitlab_Issue_Board_Notifier::get_instance();
+		$this->types = WP_Gitlab_Issue_Board_Types::get_instance();
+		$this->gitlab_client = WP_Gitlab_Issue_Board_API_Client::get_instance();
 
+		add_action( 'init', function() {
+			// echo 'init set access token';
+			if( $this->configurator->is_ready() ) {
+				// echo 'init set access token';
+				$this->gitlab_client->set_access_token(
+					$this->configurator->get_access_token()
+				);
+			}
+		}, 10 );
 	}
 
 
@@ -125,8 +150,8 @@ class WP_Gitlab_Issue_Board {
 	public function display_board_app() {
 	?>
 		<h1>GitLab Issue Board</h1>
-		<a href="#!/">Board</a> | <a href="#!/tools">Tools</a>
 		<div ng-app="WordPressGitlabIssueBoard" id="wp-gitlab-issues-app">
+		<a href="#!/">Board</a> | <a href="#!/tools">Tools</a> | <a href="#!/sync-projects">Sync projects</a>
 			<ui-view></ui-view>
 		</div>
 	<?php
