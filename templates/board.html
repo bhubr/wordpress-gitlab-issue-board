@@ -6,3 +6,8 @@
 <ul>
   <li ng-repeat="p in $ctrl.projects">{{ p.id }} - {{ p.gl_pid }} - {{ p.title.rendered }} <a href="#" ng-click="$ctrl.syncIssues(p.id)">sync</a></li>
 </ul>
+
+<h3>Issues</h3>
+<ul>
+  <li ng-repeat="i in $ctrl.issues" ng-class="{ 'issue-new': i._is_new }">{{ i.id }} - {{ i.gl_id }} - {{ i.gl_iid }} - {{ i.gl_pid }} - {{ i.title.rendered }}</li>
+</ul>

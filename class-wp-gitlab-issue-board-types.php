@@ -206,21 +206,74 @@ class WP_Gitlab_Issue_Board_Types {
 				'id' => $post->ID,
 				'title' => array( 'rendered' => $post->post_title ),
 				'gl_pid' => get_post_meta( $post->ID, 'gl_pid', true ),
-				'new' => array_search( $post->ID, $new_project_ids ) !== false
+				'_is_new' => array_search( $post->ID, $new_project_ids ) !== false
 			);
 		}, $project_posts );
 		die( json_encode( $data ) );
 	}
 
+
+	// TODO: handle update from GitLab also
 	public function sync_issues_gitlab_to_wpdb( WP_REST_Request $request ) {
 		$body = $request->get_json_params();
-		$post_id = (int)$body['post_id'];
-		$gitlab_pid = (int)get_post_meta( $post_id, 'gl_pid', true );
+		$project_post_id = (int)$body['post_id'];
+		$gitlab_pid = (int)get_post_meta( $project_post_id, 'gl_pid', true );
 		$client = WP_Gitlab_Issue_Board_API_Client::get_instance();
 		$issues = $client->get_all_of_type( 'issue', array(
 			'gl_pid' => $gitlab_pid
 		) );
-		die( json_encode( $issues ) );
+		$new_issue_ids = array();
+
+
+		foreach( $issues as $issue ) {
+
+			$issue_id = $issue['id'];
+			if( $this->has_post_by_meta( 'project', 'gl_pid', $issue_id ) ) {
+				continue;
+			}
+
+			$post = array(
+				'post_type'     => 'issue',
+				'post_status'   => 'publish',
+				'post_title'    => $issue['title'],
+				'post_content'  => $issue['description'],
+				'post_date'     => $issue['created_at'],
+				'post_modified' => $issue['updated_at']
+			);
+			$id = wp_insert_post( $post );
+			if( ! $id ) {
+				die("could not create post");
+			}
+			$new_issue_ids[] = $id;
+
+			update_post_meta( $id, 'wp_pid', $project_post_id );
+			update_post_meta( $id, 'gl_id', $issue['id'] );
+			update_post_meta( $id, 'gl_iid', $issue['iid'] );
+			update_post_meta( $id, 'gl_pid', $issue['project_id'] );
+			update_post_meta( $id, 'gl_state', $issue['state'] );
+
+			foreach( $issue['labels'] as $label ) {
+				$existing = get_term_by( 'name', $label, 'issue_label' );
+				if( ! $existing ) {
+					$t_tt_ids = wp_insert_term( $label, 'issue_label' );
+				}
+			}
+			wp_set_post_terms( $id, $issue['labels'], 'issue_label', false );
+		}
+		$issue_posts = get_posts( [ 'post_type' => 'issue' ] );
+		$data = array_map( function( $post ) use( $new_issue_ids ) {
+			return array(
+				'id' => $post->ID,
+				'title' => array( 'rendered' => $post->post_title ),
+				'wp_pid' => get_post_meta( $post->ID, 'wp_pid', true ),
+				'gl_id' => get_post_meta( $post->ID, 'gl_id', true ),
+				'gl_iid' => get_post_meta( $post->ID, 'gl_iid', true ),
+				'gl_pid' => get_post_meta( $post->ID, 'gl_pid', true ),
+				'gl_state' => get_post_meta( $post->ID, 'gl_state', true ),
+				'_is_new' => array_search( $post->ID, $new_issue_ids ) !== false
+			);
+		}, $issue_posts );
+		die( json_encode( $data ) );
 	}
 
 
