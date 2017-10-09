@@ -59,12 +59,21 @@ class WP_Gitlab_Issue_Board_API_Client {
 	}
 
 
-	public function get_all_of_type( $type ) {
+	public function get_issue_page( $page, $args ) {
+		$this->init_gitlab_client();
+		return $this->client->api('issues')->all($args['gl_pid'], array(
+			'per_page' => 10,
+			'page'     => $page
+		) );
+	}
+
+
+	public function get_all_of_type( $type, $args = array() ) {
 		$page_getter_func = "get_{$type}_page";
 		$page = 1;
 		$all_items = array();
 		$items = array();
-		while( count( $items = $this->$page_getter_func( $page ) ) ) {
+		while( count( $items = $this->$page_getter_func( $page, $args ) ) ) {
 			$all_items = array_merge( $all_items, $items );
 			$page++;
 		}

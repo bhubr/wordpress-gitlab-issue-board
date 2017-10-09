@@ -120,6 +120,22 @@ function DataService($rootScope, $http, $q, _) {
     });;
   }
 
+  function syncIssues(postId) {
+    return $http({
+      method: 'POST',
+      url: window.siteRoot + '/wp-json/wpglib/v1/sync-issues',
+      data: {
+        post_id: postId
+      },
+      headers: {
+        'X-WP-Nonce': wpApiSettings.nonce
+      }
+    })
+    .then(function(response) {
+      return response.data;
+    });;
+  }
+
   function getIssues() {
     return getAllPages('issue', {
       per_page: 100, orderby: 'date', order: 'asc'
@@ -149,6 +165,7 @@ function DataService($rootScope, $http, $q, _) {
   return {
     getProjects: getProjects,
     syncProjects: syncProjects,
+    syncIssues: syncIssues,
     getIssues: getIssues,
     getIssueCats: getIssueCats,
     getIssueLabels: getIssueLabels,

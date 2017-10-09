@@ -1,4 +1,13 @@
 <?php
+
+function wpgli_slug_get_post_meta_cb( $object, $field_name, $request ) {
+	return get_post_meta( $object[ 'id' ], $field_name, true );
+}
+
+function wpgli_slug_update_post_meta_cb( $value, $object, $field_name ) {
+	return update_post_meta( $object->ID, $field_name, $value );
+}
+
 class WP_Gitlab_Issue_Board_Types {
 
 	/**
@@ -140,6 +149,10 @@ class WP_Gitlab_Issue_Board_Types {
 	        'methods' => 'POST',
 	        'callback' => array( $this, 'sync_projects_gitlab_to_wpdb' ),
 	    ));
+	    register_rest_route( 'wpglib/v1', '/sync-issues', array(
+	        'methods' => 'POST',
+	        'callback' => array( $this, 'sync_issues_gitlab_to_wpdb' ),
+	    ));
 	}
 
 
@@ -199,6 +212,16 @@ class WP_Gitlab_Issue_Board_Types {
 		die( json_encode( $data ) );
 	}
 
+	public function sync_issues_gitlab_to_wpdb( WP_REST_Request $request ) {
+		$body = $request->get_json_params();
+		$post_id = (int)$body['post_id'];
+		$gitlab_pid = (int)get_post_meta( $post_id, 'gl_pid', true );
+		$client = WP_Gitlab_Issue_Board_API_Client::get_instance();
+		$issues = $client->get_all_of_type( 'issue', array(
+			'gl_pid' => $gitlab_pid
+		) );
+		die( json_encode( $issues ) );
+	}
 
 
 }

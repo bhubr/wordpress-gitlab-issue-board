@@ -11,6 +11,14 @@ function BoardController($rootScope, $http, $timeout, _, dataService) {
       $ctrl.projects = projects;
     });
   }
+
+  $ctrl.syncIssues = function(postId) {
+    dataService.syncIssues(postId)
+    .then(function(issues) {
+      console.log('got issues', issues);
+      $ctrl.issues = issues;
+    });
+  }
 }
 
 module.exports = {
