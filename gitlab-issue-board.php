@@ -11,10 +11,10 @@
  Text Domain: wpglib
  */
 require 'vendor/autoload.php';
-require 'class-wp-gitlab-issue-board-configurator.php';
-require 'class-wp-gitlab-issue-board-notifier.php';
-require 'class-wp-gitlab-issue-board-types.php';
-require 'class-wp-gitlab-issue-board-client.php';
+require 'src/class-wp-gitlab-issue-board-configurator.php';
+require 'src/class-wp-gitlab-issue-board-notifier.php';
+require 'src/class-wp-gitlab-issue-board-types.php';
+require 'src/class-wp-gitlab-issue-board-client.php';
 
 class WP_Gitlab_Issue_Board {
 
@@ -65,11 +65,12 @@ class WP_Gitlab_Issue_Board {
 		$this->gitlab_client = WP_Gitlab_Issue_Board_API_Client::get_instance();
 
 		add_action( 'init', function() {
-			// echo 'init set access token';
 			if( $this->configurator->is_ready() ) {
-				// echo 'init set access token';
 				$this->gitlab_client->set_access_token(
 					$this->configurator->get_access_token()
+				);
+				$this->gitlab_client->set_domain(
+					$this->configurator->get_domain()
 				);
 			}
 		}, 10 );
