@@ -172,6 +172,22 @@ class WP_Gitlab_Issue_Board_Types {
 		return $query->have_posts();
 	}
 
+	private function get_posts_by_meta( $post_type, $key, $val ) {
+		$args = array(
+			'post_type'  => $post_type,
+		    'meta_query' => array(
+		        array(
+		            'key' => $key,
+		            'value' => $val,
+		            'compare' => '=',
+		        )
+		   ),
+		    'posts_per_page' => 200
+		);
+		$query = new WP_Query($args);
+		return $query->get_posts();
+	}
+
 
 	public function sync_projects_gitlab_to_wpdb() {
 		$client = WP_Gitlab_Issue_Board_API_Client::get_instance();
@@ -213,6 +229,32 @@ class WP_Gitlab_Issue_Board_Types {
 	}
 
 
+	public function get_existing_issue( $gl_project_id, $gl_issue_iid ) {
+		global $wpdb;
+		$metas_with_same_iid = $wpdb->get_results(
+			"SELECT meta_id, post_id FROM {$wpdb->postmeta} where meta_key='gl_iid' and meta_value='{$gl_issue_iid}'"
+		);
+		// echo "metas with same iid $gl_issue_iid\n";
+		// var_dump($metas_with_same_iid);
+		$posts_with_same_iid_ids = array_map( function( $meta ) {
+			return $meta->post_id;
+		}, $metas_with_same_iid );
+		$posts_ids_joined = implode( ',', $posts_with_same_iid_ids );
+		$issues_with_same_iid_and_pid = $wpdb->get_results(
+			"SELECT meta_id, post_id FROM {$wpdb->postmeta} where meta_key='gl_pid' and meta_value='{$gl_project_id}' AND post_id IN({$posts_ids_joined})"
+		);
+		// echo "ids joined\n";
+		// var_dump($posts_ids_joined);
+		// echo "issues with same iid $gl_issue_iid and pid $gl_project_id\n";
+		// var_dump($issues_with_same_iid_and_pid);
+		error_log( empty( $issues_with_same_iid_and_pid ) ?
+			"not found: issue $gl_issue_iid of project $gl_issue_iid" :
+			"exists: issue $gl_issue_iid of project $gl_issue_iid"
+		 );
+		return empty( $issues_with_same_iid_and_pid );
+	}
+
+
 	// TODO: handle update from GitLab also
 	public function sync_issues_gitlab_to_wpdb( WP_REST_Request $request ) {
 		$body = $request->get_json_params();
@@ -227,8 +269,14 @@ class WP_Gitlab_Issue_Board_Types {
 
 		foreach( $issues as $issue ) {
 
-			$issue_id = $issue['id'];
-			if( $this->has_post_by_meta( 'project', 'gl_pid', $issue_id ) ) {
+			$issue_iid = $issue['iid'];
+			// if( $existing_entries = $this->get_posts_by_meta( 'issue', 'gl_iid', $issue_iid ) ) {
+			// 	$existing_ids = array_map( function( $entry ) {
+			// 		return $entry->ID;
+			// 	}, $existing_entries);
+			// 	continue;
+			// }
+			if( $this->get_existing_issue( $gitlab_pid, $issue_iid ) ) {
 				continue;
 			}
 
@@ -260,7 +308,8 @@ class WP_Gitlab_Issue_Board_Types {
 			}
 			wp_set_post_terms( $id, $issue['labels'], 'issue_label', false );
 		}
-		$issue_posts = get_posts( [ 'post_type' => 'issue' ] );
+		// $issue_posts = get_posts( [ 'post_type' => 'issue' ] );
+		$issue_posts = $this->get_posts_by_meta( 'issue', 'gl_pid', $gitlab_pid );
 		$data = array_map( function( $post ) use( $new_issue_ids ) {
 			return array(
 				'id' => $post->ID,
