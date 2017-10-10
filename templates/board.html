@@ -11,5 +11,5 @@
 
 <h3>Issues</h3>
 <ul>
-  <li ng-repeat="i in $ctrl.issues" ng-class="{ 'issue-new': i._is_new }">{{ i.id }} - {{ i.gl_id }} - {{ i.gl_iid }} - {{ i.gl_pid }} - {{ i.title.rendered }}</li>
+  <li ng-repeat="i in $ctrl.issues" ng-class="{ 'issue-new': i._is_new }">{{ i.id }} - {{ i.gl_id }} - {{ i.gl_iid }} - {{ i.gl_project_id }} - {{ i.wp_project_id }} - {{ i.title.rendered }}</li>
 </ul>

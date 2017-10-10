@@ -25,6 +25,7 @@ module.exports = {
   templateUrl: window.templatesRoot + '/board.html',
   controller: BoardController,
   bindings: {
-    projects: '='
+    projects: '=',
+    issues: '='
   }
 };
