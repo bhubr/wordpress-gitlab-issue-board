@@ -11,3 +11,12 @@ function generate_project_name() {
 		pick_from_array( $adjectives ) . ' ' .
 		pick_from_array( $monsters );
 }
+
+function generate_issue_title() {
+	$verbs = require('verbs.php');
+	$adjectives = require('adjectives.php');
+	$monsters = require('monsters.php');
+	return ucfirst( pick_from_array( $verbs ) ) . ' ' .
+		pick_from_array( $adjectives ) . ' ' .
+		pick_from_array( $monsters );
+}

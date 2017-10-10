@@ -1,4 +1,4 @@
-<!-- <?php
+<?php
 
 namespace bhubr\wp;
 
@@ -71,4 +71,3 @@ class Gitlab_Issue_Board_Project_Importer {
 	}
 
 }
- -->

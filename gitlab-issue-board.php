@@ -17,12 +17,13 @@ define( 'WPGLIB_DEBUG', false );
 require 'vendor/autoload.php';
 require 'src/class-wp-gitlab-issue-board-configurator.php';
 require 'src/class-wp-gitlab-issue-board-notifier.php';
-// require 'src/class-wp-gitlab-issue-board-types.php';
 require 'src/class-wp-gitlab-issue-board-client.php';
 require 'src/functions.php';
 require 'src/register-types.php';
 require 'src/rest-setup.php';
+require 'src/wpdb-io-issues.php';
 require 'src/wpdb-io-projects.php';
+require 'src/wpdb-io-common.php';
 
 class Gitlab_Issue_Board {
 
