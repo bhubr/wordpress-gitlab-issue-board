@@ -10,8 +10,8 @@
  License URI: https://www.gnu.org/licenses/gpl-2.0.html
  Text Domain: wpglib
  */
-
 namespace bhubr\wp;
+error_log('begin wpglib');
 
 define( 'WPGLIB_DEBUG', false );
 require 'vendor/autoload.php';

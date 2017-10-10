@@ -93,6 +93,7 @@ class Gitlab_Issue_Board_API_Client {
 		$client = $this->get_client();
 	    $pager = new \Gitlab\ResultPager($client);
 	    $api = $client->api('projects');
+	    error_log('fire projects GET request');
 	    return $pager->fetchAll($api, 'all');
 	}
 

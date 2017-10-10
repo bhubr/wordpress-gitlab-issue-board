@@ -168,7 +168,7 @@ function sync_gitlab_projects_to_wp() {
 	$projects = null;
 	try {
 		$projects = $client->get_all_projects();
-		error_log( 'api client fetched ' . count($projects) . ' projects' );
+		error_log( 'api client fetched ' . count($projects) . ' projects ' . print_r($projects,true) );
 	} catch( Exception $e ) {
 		return new \WP_REST_Response( [ 'error' => $e->getMessage() ], 500 );
 	}
@@ -181,10 +181,12 @@ function sync_gitlab_projects_to_wp() {
 }
 
 function sync_gitlab_issues_to_wp( \WP_REST_Request $request ) {
+	error_log('begin sync_gitlab_issues_to_wp');
 	// 1. get issues
 	// 2. inject them in db
 	$params = $request->get_json_params();
 	$client = Gitlab_Issue_Board_API_Client::get_instance();
+	error_log('sync_gitlab_issues_to_wp got client '. print_r($client,true));
 	$issues = null;
 	try {
 		$issues = $client->get_all_issues( $params['post_id'] );
