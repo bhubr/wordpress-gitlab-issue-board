@@ -93,8 +93,10 @@ class Gitlab_Issue_Board_API_Client {
 		$client = $this->get_client();
 	    $pager = new \Gitlab\ResultPager($client);
 	    $api = $client->api('projects');
-	    error_log('fire projects GET request');
-	    return $pager->fetchAll($api, 'all');
+	    // error_log('fire projects GET request');
+	    return $pager->fetchAll( $api, 'all', array(
+	    	array( 'membership' => true )
+	    ) );
 	}
 
 
@@ -102,7 +104,7 @@ class Gitlab_Issue_Board_API_Client {
 		$client = $this->get_client();
 	    $pager = new \Gitlab\ResultPager($client);
 	    $api = $client->api('issues');
-	    return $pager->fetchAll( $api, 'all', [ 'project_id' => $project_id ] );
+	    return $pager->fetchAll( $api, 'all', [ 'project_id' => $project_id, [ 'sort' => 'asc' ] ] );
 	}
 
 	public function get_all_of_type( $type, $args = array() ) {
