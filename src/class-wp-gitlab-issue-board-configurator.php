@@ -143,7 +143,7 @@ class Gitlab_Issue_Board_Configurator {
 			! isset( $this->gitlab_account_data['data'] ) ||
 			! isset( $this->gitlab_account_data['data']['accessToken'] )
 		) {
-			throw new Exception( 'Could not find access token in account data' );
+			throw new \Exception( 'Could not find access token in account data' );
 		}
 		return $this->gitlab_account_data['data']['accessToken'];
 	}
@@ -300,7 +300,7 @@ class Gitlab_Issue_Board_Configurator {
 				update_user_meta( $this->user->ID, 'wpglib_account', $this->gitlab_account_data );
 				wp_redirect( $this->get_page_url() . '&success=2' );
 
-			} catch (Exception $e) {
+			} catch (\Exception $e) {
 				wp_redirect( $this->get_page_url() . '&error=1' );
 			}
 		}
@@ -311,7 +311,7 @@ class Gitlab_Issue_Board_Configurator {
 	 * Instantiate the OAuth provider
 	 */
 	public function init_gitlab_oauth_provider() {
-		$this->oauth_provider = new Omines\OAuth2\Client\Provider\Gitlab(
+		$this->oauth_provider = new \Omines\OAuth2\Client\Provider\Gitlab(
 			$this->gitlab_account_data['config']
 		);
 	}
