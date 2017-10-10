@@ -119,30 +119,30 @@ class WPDB_IO_Projects_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'project', $result->post_type );
 		$this->assertEquals( 'publish', $result->post_status );
 
-		// $request = new WP_REST_Request( 'GET', '/wp/v2/project' );
-		// $response = $this->server->dispatch( $request );
-		// $this->assertEquals( 200, $response->status );
-		// $picked_values = pick_array_keys( $response->data[0], [
-		// 	'id', 'gl_project_id', 'guid', 'post_title', 'status', 'type', 'slug', 'title', 'content'
-		// ] );
-		// $this->assertEquals( [
-  //   			'id' => 6,
-  //   			'gl_project_id' => 17400,
-  //   			'guid' => [
-  //   				'rendered' => GITLAB_DOMAIN . '/spirit/tripping-frankensteins-monster'
-  //   			],
-  //   			'title' => [
-  //   				'rendered' => "Spirit / tripping Frankenstein’s monster"
-		// 		],
-  //   			'content' => [
-  //   				'rendered' => 'lorem ipsum go to hell',
-  //   				'protected' => false
-		// 		],
-		// 		'status' => 'publish',
-		// 		'type' => 'project',
-		// 		'slug' => 'spirit-tripping-frankensteins-monster'
-	 //    	], $picked_values
-	 //    );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/project' );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->status );
+		$picked_values = pick_array_keys( $response->data[0], [
+			'id', 'gl_project_id', 'guid', 'post_title', 'status', 'type', 'slug', 'title', 'content'
+		] );
+		$this->assertEquals( [
+    			'id' => 13,
+    			'gl_project_id' => 17400,
+    			'guid' => [
+    				'rendered' => GITLAB_DOMAIN . '/spirit/tripping-frankensteins-monster'
+    			],
+    			'title' => [
+    				'rendered' => "Spirit / tripping Frankenstein’s monster"
+				],
+    			'content' => [
+    				'rendered' => 'lorem ipsum go to hell',
+    				'protected' => false
+				],
+				'status' => 'publish',
+				'type' => 'project',
+				'slug' => 'spirit-tripping-frankensteins-monster'
+	    	], $picked_values
+	    );
 	}
 
 

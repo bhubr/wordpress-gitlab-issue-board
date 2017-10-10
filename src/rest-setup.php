@@ -27,6 +27,15 @@ function disable_auto_paragraph( $content ) {
 	return $content;
 }
 
+
+function get_post_meta_cb( $object, $field_name, $request ) {
+	return get_post_meta( $object[ 'id' ], $field_name, true );
+}
+
+function update_post_meta_cb( $value, $object, $field_name ) {
+	return update_post_meta( $object->ID, $field_name, $value );
+}
+
 /**
  * REST fields
  */
@@ -42,31 +51,31 @@ function register_fields() {
 	register_rest_field( 'issue',
 		'gl_id',
 		array(
-			'get_callback'    => 'wpglib_slug_get_post_meta_cb',
-			'update_callback' => 'wpglib_slug_update_post_meta_cb',
+			'get_callback'    => '\\bhubr\\wp\\glib\\rest\\get_post_meta_cb',
+			'update_callback' => '\\bhubr\\wp\\glib\\rest\\update_post_meta_cb',
 			'schema'          => null,
 		)
 	);
 	register_rest_field( 'issue',
 		'gl_iid',
 		array(
-			'get_callback'    => 'wpglib_slug_get_post_meta_cb',
-			'update_callback' => 'wpglib_slug_update_post_meta_cb',
+			'get_callback'    => '\\bhubr\\wp\\glib\\rest\\get_post_meta_cb',
+			'update_callback' => '\\bhubr\\wp\\glib\\rest\\update_post_meta_cb',
 			'schema'          => null,
 		)
 	);
 	register_rest_field( 'issue',
 		'gl_pid',
 		array(
-			'get_callback'    => 'wpglib_slug_get_post_meta_cb',
-			'update_callback' => 'wpglib_slug_update_post_meta_cb',
+			'get_callback'    => '\\bhubr\\wp\\glib\\rest\\get_post_meta_cb',
+			'update_callback' => '\\bhubr\\wp\\glib\\rest\\update_post_meta_cb',
 			'schema'          => null,
 		)
 	);
 	register_rest_field( 'issue',
 		'gl_state',
 		array(
-			'get_callback'    => 'wpglib_slug_get_post_meta_cb',
+			'get_callback'    => '\\bhubr\\wp\\glib\\rest\\get_post_meta_cb',
 			'update_callback' => null, // [$this, 'wpgli_update_state_meta_cb'],
 			'schema'          => null,
 		)
@@ -74,16 +83,16 @@ function register_fields() {
 	register_rest_field( 'issue',
 		'priority',
 		array(
-			'get_callback'    => 'wpglib_slug_get_post_meta_cb',
-			'update_callback' => 'wpglib_slug_update_post_meta_cb',
+			'get_callback'    => '\\bhubr\\wp\\glib\\rest\\get_post_meta_cb',
+			'update_callback' => '\\bhubr\\wp\\glib\\rest\\update_post_meta_cb',
 			'schema'          => null,
 		)
 	);
 	register_rest_field( 'issue',
 		'percent_done',
 		array(
-			'get_callback'    => 'wpglib_slug_get_post_meta_cb',
-			'update_callback' => 'wpglib_slug_update_post_meta_cb',
+			'get_callback'    => '\\bhubr\\wp\\glib\\rest\\get_post_meta_cb',
+			'update_callback' => '\\bhubr\\wp\\glib\\rest\\update_post_meta_cb',
 			'schema'          => null,
 		)
 	 );
@@ -151,6 +160,26 @@ function sync_gitlab_projects_to_wp() {
 	return new \WP_REST_Response( $mapped, 200 );
 }
 
+function sync_gitlab_issues_to_wp() {
+
+	// 1. get projects
+	// 2. inject them in db
+	$client = Gitlab_Issue_Board_API_Client::get_instance();
+	$projects = null;
+	try {
+		$projects = $client->get_all_projects();
+		error_log( 'api client fetched ' . count($projects) . ' projects' );
+	} catch( Exception $e ) {
+		return new \WP_REST_Response( [ 'error' => $e->getMessage() ], 500 );
+	}
+
+	$results = wpdb_io\import_many_projects( $projects );
+
+	$mapped = map_wp_posts_fields( $results );
+
+	return new \WP_REST_Response( $mapped, 200 );
+}
+
 /**
  * REST routes
  */
@@ -161,6 +190,6 @@ function register_routes() {
     ));
     register_rest_route( 'wpglib/v1', '/sync-issues', array(
         'methods' => 'POST',
-        'callback' => 'pouet_issues',
+        'callback' => '\\bhubr\\wp\\glib\\rest\\sync_gitlab_issues_to_wp'
     ));
 }

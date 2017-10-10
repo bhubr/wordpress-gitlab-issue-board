@@ -97,6 +97,13 @@ class Gitlab_Issue_Board_API_Client {
 	}
 
 
+	public function get_all_issues( $project_id ) {
+		$client = $this->get_client();
+	    $pager = new \Gitlab\ResultPager($client);
+	    $api = $client->api('projects');
+	    return $pager->fetchAll($api, 'all');
+	}
+
 	public function get_all_of_type( $type, $args = array() ) {
 		$page_getter_func = "get_{$type}_page";
 		$page = 1;

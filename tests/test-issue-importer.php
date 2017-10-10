@@ -136,28 +136,30 @@ class WPDB_IO_Issues_Test extends WP_UnitTestCase {
 
 		$request = new WP_REST_Request( 'GET', '/wp/v2/issue' );
 		$response = $this->server->dispatch( $request );
-		// $this->assertEquals( 200, $response->status );
-		// $picked_values = pick_array_keys( $response->data[0], [
-		// 	'id', 'gl_project_id', 'guid', 'post_title', 'status', 'type', 'slug', 'title', 'content'
-		// ] );
-		// $this->assertEquals( [
-  //   			'id' => 6,
-  //   			'gl_project_id' => 17400,
-  //   			'guid' => [
-  //   				'rendered' => GITLAB_DOMAIN . '/spirit/tripping-frankensteins-monster'
-  //   			],
-  //   			'title' => [
-  //   				'rendered' => "Spirit / tripping Frankenstein’s monster"
-		// 		],
-  //   			'content' => [
-  //   				'rendered' => 'lorem ipsum go to hell',
-  //   				'protected' => false
-		// 		],
-		// 		'status' => 'publish',
-		// 		'type' => 'issue',
-		// 		'slug' => 'spirit-tripping-frankensteins-monster'
-	 //    	], $picked_values
-	 //    );
+		$this->assertEquals( 200, $response->status );
+		$picked_values = pick_array_keys( $response->data[0], [
+			'id', 'gl_project_id', 'guid', 'post_title', 'status', 'type', 'slug', 'title', 'content'
+		] );
+		$this->assertEquals( [
+    			'id' => 5,
+    			'gl_project_id' => 17400,
+    			'guid' => [
+    				'rendered' => GITLAB_DOMAIN . '/basilisk/pea-brained-witch/issues/26'
+    			],
+    			'title' => [
+    				'rendered' => "Stroke hyperactive tree nymph"
+				],
+    			'content' => [
+    				'rendered' => 'lorem ipsum go to hell',
+    				'protected' => false
+				],
+				'status' => 'publish',
+				'type' => 'issue',
+				'slug' => 'stroke-hyperactive-tree-nymph',
+				'project_id' => 287200,
+				'gl_state' => 'opened'
+	    	], $picked_values
+	    );
 	}
 
 
