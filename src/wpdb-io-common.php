@@ -38,9 +38,9 @@ function compare_record_attributes( $record, $new_attrs, $key_mapping ) {
 			$attrs_updated[ $post_key ] = $new_attrs[ $attr_key ];
 		}
 	}
-	// if( ! empty( $attrs_updated ) ) {
-	// 	error_log( sprintf( "compare_record_attributes, changed: %s", implode( ',', array_keys( $attrs_updated ) ) ) );
-	// }
+	if( ! empty( $attrs_updated ) ) {
+		error_log( sprintf( "compare_record_attributes, changed: %s", implode( ',', array_keys( $attrs_updated ) ) ) );
+	}
 	return $attrs_updated;
 }
 

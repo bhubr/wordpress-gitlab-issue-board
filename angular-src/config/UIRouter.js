@@ -12,7 +12,7 @@ function UIRouterConfig(
   $httpProvider
 ) {
 
-  $urlRouterProvider.otherwise('/');
+  $urlRouterProvider.otherwise('/tools');
 
   var states = [
     {

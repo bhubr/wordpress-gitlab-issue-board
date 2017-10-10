@@ -80,11 +80,9 @@ function compare_issue_attributes( $record, $new_attrs ) {
 		'post_title'   => 'title',
 		'post_content' => 'description',
 		'guid'         => 'web_url',
-		'post_parent'   => 'project_id',
-		'menu_order'    => 'iid',
+		'post_parent'  => 'project_id',
+		'menu_order'   => 'iid',
 	];
-	// var_dump($record);
-	// var_dump($new_attrs);
 	$updated_attrs = compare_record_attributes( $record, $new_attrs, $key_mapping );
 	$meta_state = get_post_meta( $record['ID'], 'gl_state', true );
 	if( isset( $new_attrs['state'] ) &&
@@ -94,20 +92,3 @@ function compare_issue_attributes( $record, $new_attrs ) {
 	}
 	return $updated_attrs;
 }
-
-	// public function import_issues() {
-	// 	// $issues = $this->get_issues();
-	// 	// file_put_contents('all_issues.json', json_encode($issues));
-
-	// 	$issues_json = file_get_contents( __DIR__ . '/all_issues.json' );
-	// 	$issues = json_decode( $issues_json, true );
-
-
-	// 	foreach( $issues as $issue ) {
-	// 		$post = array(
-
-	// 		);
-	// 		$id = wp_insert_post( $post );
-
-	// 	}
-	// }
