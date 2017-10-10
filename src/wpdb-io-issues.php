@@ -7,7 +7,7 @@ namespace bhubr\wp\glib\wpdb_io;
  */
 function import_one_issue( $issue_attrs ) {
 	$existing_issue = false;
-	if( $existing_issue = record_already_exists( $issue_attrs ) ) {
+	if( $existing_issue = record_already_exists( $issue_attrs, 'issue' ) ) {
 		if( $updated_attrs = compare_issue_attributes( $existing_issue, $issue_attrs ) ) {
 			update_record( $existing_issue, $updated_attrs );
 			return [ $existing_issue['ID'], 'updated' ];

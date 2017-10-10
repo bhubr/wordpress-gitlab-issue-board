@@ -6,7 +6,7 @@
 
 <button ng-click="$ctrl.syncProjects()" class="button button-primary">Sync. projects</button>
 <ul class="synced-projects-list">
-  <li ng-repeat="p in $ctrl.projects" class="{{ p._changed }}">{{ p.id }} - {{ p.gl_project_id }} - {{ p.title.rendered }} <a href="#" ng-click="$ctrl.syncIssues(p.id)">sync</a></li>
+  <li ng-repeat="p in $ctrl.projects" class="{{ p._changed }}">{{ p.id }} - {{ p.gl_project_id }} - {{ p.title.rendered }} <a href="#" ng-click="$ctrl.syncIssues(p.gl_project_id)">sync</a></li>
 </ul>
 
 <h3>Issues</h3>

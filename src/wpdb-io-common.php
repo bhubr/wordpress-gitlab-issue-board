@@ -10,11 +10,11 @@ namespace bhubr\wp\glib\wpdb_io;
  *    or http://gitlab.example.com/root/shivering-raven-spirit/issues/7
  *  - comment_count (bigint 20, ok for storing GitLab IDs)
  */
-function record_already_exists( $record ) {
+function record_already_exists( $record, $post_type ) {
 	global $wpdb;
 	$query = $wpdb->prepare(
-		"SELECT * FROM {$wpdb->prefix}posts WHERE comment_count=%d AND guid LIKE '%%%s%%'",
-		$record['id'], \bhubr\wp\glib\get_domain()
+		"SELECT * FROM {$wpdb->prefix}posts WHERE post_type='%s' AND comment_count=%d AND guid LIKE '%%%s%%'",
+		$post_type, $record['id'], \bhubr\wp\glib\get_domain()
 	);
 	$results = $wpdb->get_results( $query, ARRAY_A );
 	if( ! empty( $results ) ) {

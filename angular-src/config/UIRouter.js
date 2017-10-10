@@ -24,6 +24,11 @@ function UIRouterConfig(
           'dataService', function(dataService) {
             return dataService.getProjects();
           }
+        ],
+        issues: [
+          'dataService', function(dataService) {
+            return dataService.getIssues();
+          }
         ]
       }
     },

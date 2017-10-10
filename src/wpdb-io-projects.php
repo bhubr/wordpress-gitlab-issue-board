@@ -21,7 +21,7 @@ function compare_project_attributes( $project_record, $new_attrs ) {
  */
 function import_one_project( $project_attrs ) {
 	$existing_project = false;
-	if( $existing_project = record_already_exists( $project_attrs ) ) {
+	if( $existing_project = record_already_exists( $project_attrs, 'project' ) ) {
 		if( $updated_attrs = compare_project_attributes( $existing_project, $project_attrs ) ) {
 			update_record( $existing_project, $updated_attrs );
 			return [ $existing_project['ID'], 'updated' ];

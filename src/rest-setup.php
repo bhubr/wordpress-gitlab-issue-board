@@ -180,20 +180,20 @@ function sync_gitlab_projects_to_wp() {
 	return new \WP_REST_Response( $mapped, 200 );
 }
 
-function sync_gitlab_issues_to_wp() {
-
-	// 1. get projects
+function sync_gitlab_issues_to_wp( \WP_REST_Request $request ) {
+	// 1. get issues
 	// 2. inject them in db
+	$params = $request->get_json_params();
 	$client = Gitlab_Issue_Board_API_Client::get_instance();
-	$projects = null;
+	$issues = null;
 	try {
-		$projects = $client->get_all_projects();
-		error_log( 'api client fetched ' . count($projects) . ' projects' );
+		$issues = $client->get_all_issues( $params['post_id'] );
+		error_log( 'api client fetched ' . count($issues) . ' issues' );
 	} catch( Exception $e ) {
 		return new \WP_REST_Response( [ 'error' => $e->getMessage() ], 500 );
 	}
 
-	$results = wpdb_io\import_many_projects( $projects );
+	$results = wpdb_io\import_many_issues( $issues );
 
 	$mapped = map_wp_posts_fields( $results );
 
