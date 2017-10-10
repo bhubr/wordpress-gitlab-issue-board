@@ -29,7 +29,8 @@ function disable_auto_paragraph( $content ) {
 
 
 function get_post_meta_cb( $object, $field_name, $request ) {
-	return get_post_meta( $object[ 'id' ], $field_name, true );
+	$value = get_post_meta( $object[ 'id' ], $field_name, true );
+	return is_numeric( $value ) ? (int) $value : $value;
 }
 
 function update_post_meta_cb( $value, $object, $field_name ) {
@@ -43,7 +44,7 @@ function register_fields() {
 	register_rest_field( 'project',
 		'gl_project_id',
 		array(
-			'get_callback'    => '\\bhubr\\wp\\glib\\rest\\get_meta_gitlab_project_id',
+			'get_callback'    => '\\bhubr\\wp\\glib\\rest\\get_object_gitlab_id',
 			'update_callback' => null, //'glib_update_meta_gitlab_project_id',
 			'schema'          => null,
 		)
@@ -51,7 +52,7 @@ function register_fields() {
 	register_rest_field( 'issue',
 		'gl_id',
 		array(
-			'get_callback'    => '\\bhubr\\wp\\glib\\rest\\get_post_meta_cb',
+			'get_callback'    => '\\bhubr\\wp\\glib\\rest\\get_object_gitlab_id',
 			'update_callback' => '\\bhubr\\wp\\glib\\rest\\update_post_meta_cb',
 			'schema'          => null,
 		)
@@ -59,15 +60,23 @@ function register_fields() {
 	register_rest_field( 'issue',
 		'gl_iid',
 		array(
+			'get_callback'    => '\\bhubr\\wp\\glib\\rest\\get_issue_iid',
+			'update_callback' => '\\bhubr\\wp\\glib\\rest\\update_post_meta_cb',
+			'schema'          => null,
+		)
+	);
+	register_rest_field( 'issue',
+		'gl_project_id',
+		array(
 			'get_callback'    => '\\bhubr\\wp\\glib\\rest\\get_post_meta_cb',
 			'update_callback' => '\\bhubr\\wp\\glib\\rest\\update_post_meta_cb',
 			'schema'          => null,
 		)
 	);
 	register_rest_field( 'issue',
-		'gl_pid',
+		'wp_project_id',
 		array(
-			'get_callback'    => '\\bhubr\\wp\\glib\\rest\\get_post_meta_cb',
+			'get_callback'    => '\\bhubr\\wp\\glib\\rest\\get_issue_wp_post_id',
 			'update_callback' => '\\bhubr\\wp\\glib\\rest\\update_post_meta_cb',
 			'schema'          => null,
 		)
@@ -103,12 +112,23 @@ function update_meta_gitlab_project_id( $value, $object, $field_name ) {
 	throw new Exception( 'should not attempt to update project id' );
 }
 
-function get_meta_gitlab_project_id(  $object, $field_name, $request ) {
+function get_db_record_field( $record_id, $field ) {
 	global $wpdb;
-	$query = $wpdb->prepare( "SELECT comment_count FROM {$wpdb->prefix}posts WHERE ID=%d", $object['id'] );
+	$query = $wpdb->prepare( "SELECT $field FROM {$wpdb->prefix}posts WHERE ID=%d", $record_id );
 	$results = $wpdb->get_results( $query, OBJECT );
 	$result = array_pop( $results );
-	return (int) $result->comment_count;
+	return (int) $result->$field;
+}
+function get_object_gitlab_id(  $object, $field_name, $request ) {
+	return get_db_record_field( $object['id'], 'comment_count' );
+}
+
+function get_issue_iid( $object, $field_name, $request ) {
+	return get_db_record_field( $object['id'], 'menu_order' );
+}
+
+function get_issue_wp_post_id( $object, $field_name, $request ) {
+	return get_db_record_field( $object['id'], 'post_parent' );
 }
 
 function map_wp_post_fields( $record ) {

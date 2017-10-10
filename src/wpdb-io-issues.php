@@ -16,12 +16,22 @@ function import_one_issue( $issue_attrs ) {
 			return [ $existing_issue['ID'], 'unchanged' ];
 		}
 	}
+
+	/// post parent = id du post WORDPRESS!!!!!
+	// id gitlab dans une meta
+	global $wpdb;
+	$query = $wpdb->prepare( "SELECT ID FROM {$wpdb->prefix}posts WHERE post_type='project' and comment_count=%d", $issue_attrs['project_id'] );
+	$results = $wpdb->get_results( $query, ARRAY_A );
+	if( empty( $results ) ) {
+		error_log( "could not find parent project CPT with comment_count (project_id) = " . $issue_attrs['project_id'] );
+	}
+	$parent_wp_post_id = $results[0]['ID'];
 	$id = wp_insert_post( [
 		'post_type'     => 'issue',
 		'post_status'   => 'publish',
 		'post_title'    => $issue_attrs['title'],
 		'post_content'  => $issue_attrs['description'],
-		'post_parent'   => $issue_attrs['project_id'],
+		'post_parent'   => $parent_wp_post_id, //$issue_attrs['project_id'],
 		'menu_order'    => $issue_attrs['iid'],
 		'post_date'     => $issue_attrs['created_at'],
 		'post_modified' => $issue_attrs['updated_at'],
@@ -31,7 +41,6 @@ function import_one_issue( $issue_attrs ) {
 		// die("could not create post");
 	}
 
-	global $wpdb;
 	$query = $wpdb->prepare( "UPDATE {$wpdb->prefix}posts SET comment_count=%d WHERE ID=%d", $issue_attrs['id'], $id );
 	$wpdb->query( $query );
 
@@ -40,6 +49,7 @@ function import_one_issue( $issue_attrs ) {
 	// update_post_meta( $id, 'gl_pid', $issue['project_id'] ); // post_parent
 
 	update_post_meta( $id, 'gl_state', $issue_attrs['state'] );  // => meta
+	update_post_meta( $id, 'gl_project_id',	$issue_attrs['project_id'] );
 
 	foreach( $issue_attrs['labels'] as $label ) {
 		$existing = get_term_by( 'name', $label, 'issue_label' );

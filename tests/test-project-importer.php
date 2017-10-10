@@ -126,7 +126,7 @@ class WPDB_IO_Projects_Test extends WP_UnitTestCase {
 			'id', 'gl_project_id', 'guid', 'post_title', 'status', 'type', 'slug', 'title', 'content'
 		] );
 		$this->assertEquals( [
-    			'id' => 13,
+    			'id' => 21,
     			'gl_project_id' => 17400,
     			'guid' => [
     				'rendered' => GITLAB_DOMAIN . '/spirit/tripping-frankensteins-monster'

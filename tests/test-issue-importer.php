@@ -26,6 +26,16 @@ class WPDB_IO_Issues_Test extends WP_UnitTestCase {
 	    global $wp_rest_server;
 	    $this->server = $wp_rest_server = new WP_REST_Server;
 	    do_action( 'rest_api_init' );
+
+		$attrs = [
+			'id' => 287200,
+			'description' => 'lorem ipsum go to hell',
+			'name_with_namespace' => 'Basilisk / pea-brained witch',
+			'web_url' => GITLAB_DOMAIN . '/basilisk/pea-brained-witch'
+		];
+		$result = wpdb_io\import_one_project( $attrs );
+		echo "\n### beforeEach\n"; var_dump($result);
+
 	}
 
 	public function tearDown() {
@@ -127,22 +137,26 @@ class WPDB_IO_Issues_Test extends WP_UnitTestCase {
 		$result = array_pop( $results );
 		$this->assertEquals( 17400, $result->comment_count );
 		$this->assertEquals( 26, $result->menu_order );
-		$this->assertEquals( 287200, $result->post_parent );
+		$this->assertEquals( 9, $result->post_parent );
 		$this->assertEquals( 'Stroke hyperactive tree nymph', $result->post_title );
 		$this->assertEquals( 'lorem ipsum go to hell', $result->post_content );
 		$this->assertEquals( GITLAB_DOMAIN . '/basilisk/pea-brained-witch/issues/26', $result->guid );
 		$this->assertEquals( 'issue', $result->post_type );
 		$this->assertEquals( 'publish', $result->post_status );
+		$meta_state = get_post_meta( $result->ID, 'gl_state', true );
+		$this->assertEquals( 'opened', $meta_state );
+		$meta_proj_id = get_post_meta( $result->ID, 'gl_project_id', true );
+		$this->assertEquals( 287200, $meta_proj_id );
 
 		$request = new WP_REST_Request( 'GET', '/wp/v2/issue' );
 		$response = $this->server->dispatch( $request );
 		$this->assertEquals( 200, $response->status );
 		$picked_values = pick_array_keys( $response->data[0], [
-			'id', 'gl_project_id', 'guid', 'post_title', 'status', 'type', 'slug', 'title', 'content'
+			'id', 'gl_id', 'gl_iid', 'percent_done', 'priority', 'gl_project_id', 'wp_project_id', 'gl_state', 'guid', 'post_title', 'status', 'type', 'slug', 'title', 'content'
 		] );
 		$this->assertEquals( [
-    			'id' => 5,
-    			'gl_project_id' => 17400,
+    			'id' => 10,
+    			'gl_id' => 17400,
     			'guid' => [
     				'rendered' => GITLAB_DOMAIN . '/basilisk/pea-brained-witch/issues/26'
     			],
@@ -156,8 +170,12 @@ class WPDB_IO_Issues_Test extends WP_UnitTestCase {
 				'status' => 'publish',
 				'type' => 'issue',
 				'slug' => 'stroke-hyperactive-tree-nymph',
-				'project_id' => 287200,
-				'gl_state' => 'opened'
+				'wp_project_id' => 9,
+				'gl_iid' => 26,
+				'gl_project_id' => 287200,
+				'gl_state' => 'opened',
+				'percent_done' => '',
+				'priority' => ''
 	    	], $picked_values
 	    );
 	}
