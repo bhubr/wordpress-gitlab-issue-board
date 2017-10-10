@@ -30,14 +30,14 @@ function import_one_project( $project_attrs ) {
 			return [ $existing_project['ID'], 'unchanged' ];
 		}
 	}
+	$post_content = is_null( $project_attrs['description'] ) ? '' : $project_attrs['description'];
 	$id = wp_insert_post( [
 		'post_type'     => 'project',
 		'post_status'   => 'publish',
 		'post_title'    => $project_attrs['name_with_namespace'],
-		'post_content'  => $project_attrs['description'],
+		'post_content'  => $post_content,
 		'guid'          => $project_attrs['web_url']
 	] );
-	error_log( sprintf( "create post: %d %s %s", $id, $project_attrs['name_with_namespace'], $project_attrs['web_url'] ) );
 	global $wpdb;
 	$query = $wpdb->prepare( "UPDATE {$wpdb->prefix}posts SET comment_count=%d WHERE ID=%d", $project_attrs['id'], $id );
 	$wpdb->query( $query );
