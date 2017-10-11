@@ -113,14 +113,23 @@ function register_fields() {
 	        'schema' => null
 	    )
 	);
+	register_rest_field( 'issue_label',
+	    'wp_project_id',
+	    array(
+	        'get_callback'    => '\\bhubr\\wp\\glib\\rest\\issue_cat_get_wp_project_id_field',
+	        'update_callback' => '\\bhubr\\wp\\glib\\rest\\issue_cat_update_wp_project_id_field',
+	        'schema' => null
+	    )
+	);
 }
 
-function issue_cat_get_wp_project_id_field() {
-
+function issue_cat_get_wp_project_id_field(  $object, $meta_key ) {
+	// var_dump(func_get_args());
+	return get_term_meta( $object['id'], $meta_key, true );
 }
 
-function issue_cat_update_wp_project_id_field() {
-	
+function issue_cat_update_wp_project_id_field( $meta_value, $term, $meta_key ) {
+	update_term_meta( $term->term_id, $meta_key, $meta_value );
 }
 
 

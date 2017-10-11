@@ -15,3 +15,124 @@
   color: #45c;
   font-weight: bold;
 }
+
+
+.board-list h5 {
+  margin: 0 0 10px 0;
+}
+.board-list {
+  background: #f8f8f8;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  margin-right: 12px;
+  padding: 5px;
+  width: 220px;
+  display: inline-block;
+  vertical-align: top;
+  transition: all 0.3s;
+}
+.board-list.collapsed {
+  width: 50px;
+}
+.board-list.collapsed .board-card {
+  display: none;
+}
+.board-list .expand-collapse {
+  float: right;
+}
+.board-card .add-issue-btn {
+  height: 0;
+  transition: height 0.4s;
+  overflow: hidden;
+}
+.board-card:hover .add-issue-btn {
+  background: #ddd;
+  height: auto;
+}
+.issue-item {
+  padding: 1px 3px;
+}
+.issue-item:hover {
+  background: #ddd;
+}
+
+.issue-list {
+  background: #f8f8f8;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  margin-right: 12px;
+  padding: 5px;
+  width: 280px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.issue-list .issue-card:first-child {
+  border-top: 1px solid #f4f4f4;
+}
+.issue-list .issue-card {
+  background: #fff;
+  border-left: 1px solid #f4f4f4;
+  border-right: 1px solid #f4f4f4;
+  border-bottom: 1px solid #f4f4f4;
+  padding: 3px 5px;
+  width: 95%;
+}
+.board-list .board-card ul li.strike,
+.issue-list .issue-card.strike {
+  text-decoration: line-through;
+}
+.board-list .board-card {
+  background: #fff;
+  border: 1px solid #f4f4f4;
+  border-radius: 2px;
+  padding: 5px;
+  width: 95%;
+}
+.board-list .board-card ul li {
+  margin-left: 5px;
+}
+/*.board-list .board-card ul li:before {
+  content:"\2219";
+  margin-right: 3px;
+}*/
+.pull-right {
+  float: right;
+}
+.wpgli-btn {
+  padding: 2px 5px;
+  border-radius: 3px;
+  color: #fff;
+}
+.btn-ok {
+  background: #37a;
+  border: 1px solid #37a;
+}
+.btn-cancel {
+  background: #b42;
+  border: 1px solid #b42;
+}
+.alert-box {
+  padding: 10px;
+  border-radius: 4px;
+  height: auto;
+  margin-bottom: 10px;
+  transition: all 0.4s;
+}
+.alert-box.collapsed {
+  height: 0;
+  margin-bottom: 0;
+  overflow: hidden;
+}
+.alert-info {
+  background: #ace;
+  border: 1px solid #9bd;
+}
+.alert-success {
+  background: #7e8;
+  border: 1px solid #6d7;
+}
+.alert-error {
+  background: #eca;
+  border: 1px solid #db9;
+}

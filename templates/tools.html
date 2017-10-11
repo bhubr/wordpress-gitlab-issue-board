@@ -6,10 +6,12 @@
 
 <button ng-click="$ctrl.syncProjects()" class="button button-primary">Sync. projects</button>
 <ul class="synced-items-list">
-  <li ng-repeat="p in $ctrl.projects" class="{{ p._changed }}">{{ p.id }} - {{ p.gl_project_id }} - {{ p.title.rendered }} <a href="#" ng-click="$ctrl.syncIssues(p.gl_project_id)">sync</a></li>
+  <li ng-repeat="p in $ctrl.projects" class="{{ p._changed }}">{{ p.id }} - {{ p.gl_project_id }} - {{ p.title.rendered }} <a href="#" ng-click="$ctrl.syncIssues(p.gl_project_id)">sync</a> <a href="#" ng-click="$ctrl.createIssueCat(p.id)">create issue_cat</a></li>
 </ul>
+<input ng-model="$ctrl.fields.catName" />
 
 <h3>Issues</h3>
 <ul class="synced-items-list">
   <li ng-repeat="i in $ctrl.issues" class="{{ i._changed }}">{{ i.id }} - {{ i.gl_id }} - {{ i.gl_iid }} - {{ i.gl_project_id }} - {{ i.wp_project_id }} - {{ i.title.rendered }}</li>
 </ul>
+

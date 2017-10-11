@@ -20,14 +20,19 @@ function UIRouterConfig(
       url: '/',
       component: 'board',
       resolve: {
-        projects: [
-          'dataService', function(dataService) {
-            return dataService.getProjects();
-          }
-        ],
         issues: [
           'dataService', function(dataService) {
             return dataService.getIssues();
+          }
+        ],
+        issueCats: [
+          'dataService', function(dataService) {
+            return dataService.getIssueCats();
+          }
+        ],
+        issueLabels: [
+          'dataService', function(dataService) {
+            return dataService.getIssueLabels();
           }
         ]
       }

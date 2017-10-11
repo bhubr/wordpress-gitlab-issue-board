@@ -2,6 +2,9 @@ ToolsController.$inject = ['$rootScope', '$http', '$timeout', 'lodash', 'dataSer
 
 function ToolsController($rootScope, $http, $timeout, _, dataService) {
   var $ctrl = this;
+  $ctrl.fields = {
+    catName: ''
+  };
 
   $ctrl.syncProjects = function() {
     dataService.syncProjects()
@@ -18,6 +21,17 @@ function ToolsController($rootScope, $http, $timeout, _, dataService) {
       $ctrl.issues = issues;
     });
   };
+
+  $ctrl.createIssueCat = function(projectId) {
+    console.log('createIssueCat',$ctrl.fields);
+    dataService.createResource('issue_cat', {
+      wp_project_id: projectId,
+      name: $ctrl.fields.catName
+    })
+    .then(function(resource) {
+      console.log('created resource', resource)
+    })
+  }
 }
 
 module.exports = {

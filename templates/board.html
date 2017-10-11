@@ -1,3 +1,31 @@
 <h2>Board</h2>
 
-<p class="board-welcome">{{ $ctrl.message }}</p>
+<strong>Statuses:</strong> <span class="_pull-right">
+  <a href="#" ng-click="$ctrl.filterIssues('all')">All</a> |
+  <a href="#" ng-click="$ctrl.filterIssues('opened')">Opened</a> |
+  <a href="#" ng-click="$ctrl.filterIssues('closed')">Closed</a>
+</span>
+<div>
+  <div class="board-list" ng-class="{ collapsed: cat._collapsed }" ng-repeat="cat in $ctrl.rootCats">
+  <span class="expand-collapse" ng-click="cat._collapsed = ! cat._collapsed">{{ cat._collapsed ? '&raquo;' : '&laquo;' }}</span>
+  <h5>{{ cat.name }}</h5>
+    <div id="issue-cat-{{ child.id }}" data-drop="true" jqyoui-droppable="{ onDrop: '$ctrl.dropped' }" class="board-card" ng-repeat="child in cat.childCats">
+      {{child.name}} ({{child.closedIssues.length}}/{{child.count}})
+      <div ng-if="! child._isEditing">
+        <ul>
+          <li ng-class="{ strike: issue.gl_state === 'closed' }" class="issue-item" ng-click="$ctrl.editIssue(child, issue)" ng-repeat="issue in child.issues">#{{ issue.gl_iid }} {{ issue.title.rendered }}</li>
+        </ul>
+        <div ng-click="$ctrl.editIssue(child)" class="add-issue-btn">Add issue</div>
+      </div>
+
+      <issue-editor ng-if="child._isEditing" issue="$ctrl.issueEditing" on-cancel="$ctrl.cancelEditing()" on-submit="$ctrl.saveIssue()"></issue-editor>
+    </div>
+  </div>
+
+  <div class="issue-list">
+  <h5>Issues ({{$ctrl.stateFilter}})</h5>
+    <div id="issue-{{ issue.id }}" data-drag="true" jqyoui-draggable data-jqyoui-options="{ snap: '.board-card' }" class="issue-card" ng-repeat="issue in $ctrl.filteredIssues" ng-class="{ strike: issue.gl_state === 'closed' }">
+      {{ issue.title.rendered }}
+    </div>
+  </div>
+</div>
