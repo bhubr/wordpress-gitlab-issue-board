@@ -25,6 +25,10 @@ require 'src/wpdb-io-issues.php';
 require 'src/wpdb-io-projects.php';
 require 'src/wpdb-io-common.php';
 
+add_action( 'init', function() {
+	echo "\n\n############## DUMP INCOMING BODY\n\n";
+	var_dump(file_get_contents('php://input'));
+}, 1 );
 class Gitlab_Issue_Board {
 
 

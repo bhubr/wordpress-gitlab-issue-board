@@ -2,6 +2,7 @@
 
 
 require_once 'gitlab-api-settings.php';
+require_once 'ascii_table.php';
 
 function setup_client() {
 	$client_wrapper = bhubr\wp\Gitlab_Issue_Board_API_Client::get_instance();
@@ -76,6 +77,12 @@ function dump_issue_posts( $issues ) {
 	foreach( $issues as $i )  {
 		printf("wp id: %4d, gl id %6d iid: %3d proj. id: %5d title: %s\n", $i['id'], $i['gl_id'], $i['gl_iid'],  $i['gl_project_id'],  $i['title']['rendered']);
 	}
+}
+
+function dump_table( $tabular_data, $label = '' ) {
+	$ascii_table = new ascii_table();	
+	$table = $ascii_table->make_table( $tabular_data, $label, true );
+	echo $table;
 }
 
 function pick_post_titles( $posts ) {

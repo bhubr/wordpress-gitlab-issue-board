@@ -185,6 +185,7 @@ function map_wp_post_fields_issue( $record ) {
 	return  array_merge(
 		map_wp_post_fields($record),
 		[
+			'wp_project_id' => $record['post_parent'],
 			'gl_id' => $record['comment_count'],
 			'gl_iid' => $record['menu_order'],
 			'gl_state' => get_post_meta( $record['ID'], 'gl_state', true ),

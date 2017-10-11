@@ -210,12 +210,15 @@ class Custom_REST_Routes_Test extends WP_UnitTestCase {
 
 		$synced_issues = $response->data;
 		$this->assertEquals( 5, count( $synced_issues ) );
-		dump_issue_posts($synced_issues);
+		// dump_issue_posts($synced_issues);
+
+// dump_table( $synced_issues );
 		foreach( $synced_issues as $idx => $si ) {
 			$this->assertEquals( $idx + 100006, $si['gl_id'] );
 			$this->assertEquals( $idx + 1, $si['gl_iid'] );
 			$this->assertEquals( 'opened', $si['gl_state'] );
 			$this->assertEquals( '4002', $si['gl_project_id'] );
+			$this->assertEquals( '2', $si['wp_project_id'] );
 			$this->assertEquals( 'created', $si['_changed'] );
 		}
 	}
@@ -225,10 +228,9 @@ class Custom_REST_Routes_Test extends WP_UnitTestCase {
 			'name' => 'Root cat #1',
 			'wp_post_id' => 1
 		];
-		echo "pouet\n";
 		$request = new WP_REST_Request( 'POST', '/wp/v2/issue_cat', $issue_cat_attrs );
 		$response = $this->server->dispatch( $request );
-echo "pouet\n";
+var_dump($response->data);
 		$this->assertEquals( 200, $response->status );
 		$issue_cat_obj = $response->data;
 		$this->assertEquals( 'Root cat #1', $issue_cat_obj['name'] );
