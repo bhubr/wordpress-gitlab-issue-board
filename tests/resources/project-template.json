@@ -1,0 +1,75 @@
+{
+  "id":{{ id }},
+  "description":null,
+  "default_branch":"develop",
+  "tag_list":[
+
+  ],
+  "ssh_url_to_repo":"git@gitlab.com:{{ user.username }}/{{ project.slug }}.git",
+  "http_url_to_repo":"{{ domain }}/{{ user.username }}/{{ project.slug }}.git",
+  "web_url":"{{ domain }}/{{ user.username }}/{{ project.slug }}",
+  "name":"{{ project.name }}",
+  "name_with_namespace":"{{ user.name }} / {{ project.name }}",
+  "path":"{{ project.slug }}",
+  "path_with_namespace":"{{ user.username }}/{{ project.slug }}",
+  "star_count":0,
+  "forks_count":0,
+  "created_at":"2017-09-29T13:24:06.123Z",
+  "last_activity_at":"2017-10-06T19:53:29.646Z",
+  "_links":{
+    "self":"{{ domain }}/api/v4/projects/{{ id }}",
+    "issues":"{{ domain }}/api/v4/projects/{{ id }}/issues",
+    "merge_requests":"{{ domain }}/api/v4/projects/{{ id }}/merge_requests",
+    "repo_branches":"{{ domain }}/api/v4/projects/{{ id }}/repository/branches",
+    "labels":"{{ domain }}/api/v4/projects/{{ id }}/labels",
+    "events":"{{ domain }}/api/v4/projects/{{ id }}/events",
+    "members":"{{ domain }}/api/v4/projects/{{ id }}/members"
+  },
+  "archived":false,
+  "visibility":"private",
+  "owner":{
+    "id":{{ user.id }},
+    "name":"{{ user.name }}",
+    "username":"{{ user.username }}",
+    "state":"active",
+    "avatar_url":"http://via.placeholder.com/150x150",
+    "web_url":"{{ domain }}/{{ user.username }}"
+  },
+  "resolve_outdated_diff_discussions":false,
+  "container_registry_enabled":true,
+  "issues_enabled":true,
+  "merge_requests_enabled":true,
+  "wiki_enabled":true,
+  "jobs_enabled":true,
+  "snippets_enabled":false,
+  "shared_runners_enabled":true,
+  "lfs_enabled":true,
+  "creator_id":{{ user.id }},
+  "namespace":{
+    "id":2021890,
+    "name":"{{ user.username }}",
+    "path":"{{ user.username }}",
+    "kind":"user",
+    "full_path":"{{ user.username }}",
+    "parent_id":null
+  },
+  "import_status":"finished",
+  "avatar_url":null,
+  "open_issues_count":45,
+  "public_jobs":true,
+  "ci_config_path":null,
+  "shared_with_groups":[
+
+  ],
+  "only_allow_merge_if_pipeline_succeeds":false,
+  "request_access_enabled":false,
+  "only_allow_merge_if_all_discussions_are_resolved":false,
+  "printing_merge_request_link_enabled":true,
+  "permissions":{
+    "project_access":{
+      "access_level":40,
+      "notification_level":3
+    },
+    "group_access":null
+  }
+}

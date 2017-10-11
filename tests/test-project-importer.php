@@ -13,7 +13,7 @@ use bhubr\wp\glib\wpdb_io;
 
 require_once( realpath( __DIR__ . '/../src/wpdb-io-common.php' ) );
 require_once( realpath( __DIR__ . '/../src/wpdb-io-projects.php' ) );
-
+echo ABSPATH . "\n";
 /**
  * Sample test case.
  */
@@ -22,10 +22,13 @@ class WPDB_IO_Projects_Test extends WP_UnitTestCase {
 
 	public function setUp() {
 	    parent::setUp();
-	   
+echo "project importer " . site_url() . ' ' . ABSPATH . "\n";	   
 	    global $wp_rest_server;
 	    $this->server = $wp_rest_server = new WP_REST_Server;
 	    do_action( 'rest_api_init' );
+
+	    global $wpdb;
+	    $wpdb->query( "ALTER TABLE {$wpdb->prefix}posts AUTO_INCREMENT = 1" );
 	}
 
 	public function tearDown() {
@@ -41,7 +44,7 @@ class WPDB_IO_Projects_Test extends WP_UnitTestCase {
 			'description' => 'lorem ipsum go to hell',
 			'name_with_namespace' => 'Basilisk / pea-brained witch',
 			'web_url' => GITLAB_DOMAIN . '/basilisk/pea-brained-witch'
-		]);
+		], 'project' );
 		$this->assertFalse( $exists );
 	}
 
@@ -53,7 +56,7 @@ class WPDB_IO_Projects_Test extends WP_UnitTestCase {
 			'web_url' => GITLAB_DOMAIN . '/golum/drunken-gorgon'
 		];
 		wpdb_io\import_one_project( $attrs );
-		$existing_project = wpdb_io\record_already_exists( $attrs );
+		$existing_project = wpdb_io\record_already_exists( $attrs, 'project' );
 		$this->assertNotEmpty( $existing_project );
 	}
 
@@ -66,7 +69,7 @@ class WPDB_IO_Projects_Test extends WP_UnitTestCase {
 		];
 		wpdb_io\import_one_project( $attrs );
 		$attrs['web_url'] = GITLAB_DOMAIN . '/gnome/cruel-hearted-zombie';
-		$existing_project = wpdb_io\record_already_exists( $attrs );
+		$existing_project = wpdb_io\record_already_exists( $attrs, 'project' );
 		$this->assertNotEmpty( $existing_project );
 	}
 
@@ -78,7 +81,7 @@ class WPDB_IO_Projects_Test extends WP_UnitTestCase {
 			'web_url' => GITLAB_DOMAIN . '/gnome/cruel-hearted-troll'
 		];
 		wpdb_io\import_one_project( $attrs );
-		$existing_project = wpdb_io\record_already_exists( $attrs );
+		$existing_project = wpdb_io\record_already_exists( $attrs, 'project' );
 		$new_attrs = [
 			'description' => 'lorem ipsum go to heaven',
 			'name_with_namespace' => 'Gnome / cruel-hearted mountain troll',
@@ -126,7 +129,7 @@ class WPDB_IO_Projects_Test extends WP_UnitTestCase {
 			'id', 'gl_project_id', 'guid', 'post_title', 'status', 'type', 'slug', 'title', 'content'
 		] );
 		$this->assertEquals( [
-    			'id' => 21,
+    			'id' => 1,
     			'gl_project_id' => 17400,
     			'guid' => [
     				'rendered' => GITLAB_DOMAIN . '/spirit/tripping-frankensteins-monster'

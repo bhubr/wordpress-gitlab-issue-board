@@ -55,3 +55,24 @@ function pick_array_keys( $array, $keys ) {
 	}
 	return $output;
 }
+
+function reset_auto_increments() {
+	global $wpdb;
+	$wpdb->query( "ALTER TABLE {$wpdb->prefix}posts AUTO_INCREMENT = 1" );
+	if($wpdb->last_error !== '') :
+	    $wpdb->print_error();
+	endif;
+}
+
+function dump_project_posts( $projects ) {
+	echo "\n";
+	foreach( $projects as $p )  {
+		printf("%3d %5d %s\n", $p['id'],  $p['gl_project_id'],  $p['title']['rendered']);
+	}
+}
+
+function pick_post_titles( $posts ) {
+	return array_map( function( $post ) {
+		return $post['title']['rendered'];
+	}, $posts );
+}

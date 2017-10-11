@@ -27,6 +27,8 @@ class WPDB_IO_Issues_Test extends WP_UnitTestCase {
 	    $this->server = $wp_rest_server = new WP_REST_Server;
 	    do_action( 'rest_api_init' );
 
+	    reset_auto_increments();
+
 		$attrs = [
 			'id' => 287200,
 			'description' => 'lorem ipsum go to hell',
@@ -34,7 +36,6 @@ class WPDB_IO_Issues_Test extends WP_UnitTestCase {
 			'web_url' => GITLAB_DOMAIN . '/basilisk/pea-brained-witch'
 		];
 		$result = wpdb_io\import_one_project( $attrs );
-		echo "\n### beforeEach\n"; var_dump($result);
 
 	}
 
@@ -57,7 +58,7 @@ class WPDB_IO_Issues_Test extends WP_UnitTestCase {
 			'labels' => [],
 			'project_id' => 287200,
 			'web_url' => GITLAB_DOMAIN . '/basilisk/pea-brained-witch/issues/23'
-		]);
+		], 'issue' );
 		$this->assertFalse( $exists );
 	}
 
@@ -75,7 +76,7 @@ class WPDB_IO_Issues_Test extends WP_UnitTestCase {
 			'web_url' => GITLAB_DOMAIN . '/basilisk/pea-brained-witch/issues/24'
 		];
 		wpdb_io\import_one_issue( $attrs );
-		$existing_issue = wpdb_io\record_already_exists( $attrs );
+		$existing_issue = wpdb_io\record_already_exists( $attrs, 'issue' );
 		$this->assertNotEmpty( $existing_issue );
 	}
 
@@ -94,7 +95,7 @@ class WPDB_IO_Issues_Test extends WP_UnitTestCase {
 			'web_url' => GITLAB_DOMAIN . '/basilisk/pea-brained-witch/issues/25'
 		];
 		wpdb_io\import_one_issue( $attrs );
-		$existing_issue = wpdb_io\record_already_exists( $attrs );
+		$existing_issue = wpdb_io\record_already_exists( $attrs, 'issue' );
 		$new_attrs = [
 			'title' => 'Discourage confused sprite',
 			'description' => 'lorem ipsum go to heaven',
@@ -137,7 +138,7 @@ class WPDB_IO_Issues_Test extends WP_UnitTestCase {
 		$result = array_pop( $results );
 		$this->assertEquals( 17400, $result->comment_count );
 		$this->assertEquals( 26, $result->menu_order );
-		$this->assertEquals( 9, $result->post_parent );
+		$this->assertEquals( 1, $result->post_parent );
 		$this->assertEquals( 'Stroke hyperactive tree nymph', $result->post_title );
 		$this->assertEquals( 'lorem ipsum go to hell', $result->post_content );
 		$this->assertEquals( GITLAB_DOMAIN . '/basilisk/pea-brained-witch/issues/26', $result->guid );
@@ -155,7 +156,7 @@ class WPDB_IO_Issues_Test extends WP_UnitTestCase {
 			'id', 'gl_id', 'gl_iid', 'percent_done', 'priority', 'gl_project_id', 'wp_project_id', 'gl_state', 'guid', 'post_title', 'status', 'type', 'slug', 'title', 'content'
 		] );
 		$this->assertEquals( [
-    			'id' => 10,
+    			'id' => 2,
     			'gl_id' => 17400,
     			'guid' => [
     				'rendered' => GITLAB_DOMAIN . '/basilisk/pea-brained-witch/issues/26'
@@ -170,7 +171,7 @@ class WPDB_IO_Issues_Test extends WP_UnitTestCase {
 				'status' => 'publish',
 				'type' => 'issue',
 				'slug' => 'stroke-hyperactive-tree-nymph',
-				'wp_project_id' => 9,
+				'wp_project_id' => 1,
 				'gl_iid' => 26,
 				'gl_project_id' => 287200,
 				'gl_state' => 'opened',

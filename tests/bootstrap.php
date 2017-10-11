@@ -26,6 +26,6 @@ tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 require $_tests_dir . '/includes/bootstrap.php';
 
 require realpath( __DIR__ . '/../vendor/autoload.php' );
-require 'utils.php';
+require_once 'utils.php';
 setup_client();
-remove_all_projects();
+// remove_all_projects();
