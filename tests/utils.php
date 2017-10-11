@@ -65,9 +65,16 @@ function reset_auto_increments() {
 }
 
 function dump_project_posts( $projects ) {
-	echo "\n";
+	echo "\n#### dump_project_posts\n";
 	foreach( $projects as $p )  {
 		printf("%3d %5d %s\n", $p['id'],  $p['gl_project_id'],  $p['title']['rendered']);
+	}
+}
+
+function dump_issue_posts( $issues ) {
+	echo "\n#### dump_issue_posts\n";
+	foreach( $issues as $i )  {
+		printf("wp id: %4d, gl id %6d iid: %3d proj. id: %5d title: %s\n", $i['id'], $i['gl_id'], $i['gl_iid'],  $i['gl_project_id'],  $i['title']['rendered']);
 	}
 }
 

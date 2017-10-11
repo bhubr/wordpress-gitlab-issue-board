@@ -124,6 +124,7 @@ function get_object_gitlab_id(  $object, $field_name, $request ) {
 }
 
 function get_issue_iid( $object, $field_name, $request ) {
+	echo "get_issue_iid $field_name\n";
 	return get_db_record_field( $object['id'], 'menu_order' );
 }
 
@@ -142,7 +143,6 @@ function map_wp_post_fields( $record ) {
 		'modified'      => $record['post_modified'],
 		'modified_gmt'  => $record['post_modified_gmt'],
 		'link'          => get_permalink( $record['ID'] ),
-		'gl_project_id' => $record['comment_count'],
 		'title'         =>  [
 			'rendered'  => $record['post_title']
 		],
@@ -152,13 +152,40 @@ function map_wp_post_fields( $record ) {
 		'guid'          =>  [
 			'rendered'  => $record['guid']
 		],
-		'_changed'      => $record['_changed']
+		'_changed'      => $record['_changed'],
 	];
 }
 
-function map_wp_posts_fields( $records ) {
-	return array_map( '\\bhubr\\wp\\glib\\rest\\map_wp_post_fields', $records );
+function map_wp_post_fields_project( $record ) {
+	return array_merge(
+		map_wp_post_fields($record),
+		[
+			'gl_project_id' => $record['comment_count']
+		]
+	);
 }
+
+function map_wp_post_fields_issue( $record ) {
+	return  array_merge(
+		map_wp_post_fields($record),
+		[
+			'gl_id' => $record['comment_count'],
+			'gl_iid' => $record['menu_order'],
+			'gl_state' => get_post_meta( $record['ID'], 'gl_state', true ),
+			'gl_project_id' => get_post_meta( $record['ID'], 'gl_project_id', true )
+		]
+	);
+}
+
+
+function map_wp_projects_fields( $records ) {
+	return array_map( '\\bhubr\\wp\\glib\\rest\\map_wp_post_fields_project', $records );
+}
+
+function map_wp_issues_fields( $records ) {
+	return array_map( '\\bhubr\\wp\\glib\\rest\\map_wp_post_fields_issue', $records );
+}
+
 
 function sync_gitlab_projects_to_wp() {
 
@@ -173,8 +200,7 @@ function sync_gitlab_projects_to_wp() {
 	}
 
 	$results = wpdb_io\import_many_projects( $projects );
-
-	$mapped = map_wp_posts_fields( $results );
+	$mapped = map_wp_projects_fields( $results );
 
 	return new \WP_REST_Response( $mapped, 200 );
 }
@@ -182,18 +208,19 @@ function sync_gitlab_projects_to_wp() {
 function sync_gitlab_issues_to_wp( \WP_REST_Request $request ) {
 	// 1. get issues
 	// 2. inject them in db
-	$params = $request->get_json_params();
+	$params = $request->get_url_params();
 	$client = Gitlab_Issue_Board_API_Client::get_instance();
 	$issues = null;
 	try {
-		$issues = $client->get_all_issues( $params['post_id'] );
+		// var_dump($params);
+		$issues = $client->get_all_issues( $params['id'] );
+		// var_dump($issues);
 	} catch( Exception $e ) {
 		return new \WP_REST_Response( [ 'error' => $e->getMessage() ], 500 );
 	}
 
 	$results = wpdb_io\import_many_issues( $issues );
-
-	$mapped = map_wp_posts_fields( $results );
+	$mapped = map_wp_issues_fields( $results );
 
 	return new \WP_REST_Response( $mapped, 200 );
 }
@@ -206,7 +233,7 @@ function register_routes() {
         'methods' => 'POST',
         'callback' => '\\bhubr\\wp\\glib\\rest\\sync_gitlab_projects_to_wp'
     ));
-    register_rest_route( 'wpglib/v1', '/sync-issues', array(
+    register_rest_route( 'wpglib/v1', '/sync-issues/(?P<id>\d+)', array(
         'methods' => 'POST',
         'callback' => '\\bhubr\\wp\\glib\\rest\\sync_gitlab_issues_to_wp'
     ));

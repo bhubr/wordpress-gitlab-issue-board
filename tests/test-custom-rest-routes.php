@@ -99,6 +99,50 @@ class Custom_REST_Routes_Test extends WP_UnitTestCase {
 		}
 	}
 
+
+	public function test_mock_backend_issue_update() {
+		$updated_title = 'updated title ' . time();
+		$response = $this->client->request('PUT', GITLAB_DOMAIN . '/api/v4/projects/4001/issues/2', [
+			'json' => [ 'title' => $updated_title ]
+		]);
+
+		$this->assertEquals( 200, $response->getStatusCode() );
+		$updated_issue = json_decode( $response->getBody()->getContents(), true );
+		$this->assertEquals( $updated_title, $updated_issue['title'] );
+
+		$response = $this->client->request('GET', GITLAB_DOMAIN . '/api/v4/projects/4001/issues/2');
+		$this->assertEquals( 200, $response->getStatusCode() );
+		$issue = json_decode( $response->getBody()->getContents(), true );
+		$this->assertEquals( $updated_title, $issue['title'] );
+	}
+
+	public function test_mock_backend_issue_read_not_found() {
+		try {
+			$response = $this->client->request('GET', GITLAB_DOMAIN . '/api/v4/projects/4001/issues/999');
+		} catch( \Exception $e ) {
+			$this->assertEquals( 404, $e->getCode() );
+		}
+		
+	}
+
+	public function test_mock_backend_issue_update_not_found() {
+		try {
+			$response = $this->client->request('PUT', GITLAB_DOMAIN . '/api/v4/projects/4001/issues/999', [
+				'json' => [ 'name_with_namespace' => 'new name' ]
+			]);
+		} catch( \Exception $e ) {
+			$this->assertEquals( 404, $e->getCode() );
+		}
+	}
+
+	public function test_mock_backend_issue_delete_not_found() {
+		try {
+			$response = $this->client->request('DELETE', GITLAB_DOMAIN . '/api/v4/projects/4001/issues/999');
+		} catch( \Exception $e ) {
+			$this->assertEquals( 404, $e->getCode() );
+		}
+	}
+
 	public function test_sync_projects() {
 		$request = new WP_REST_Request( 'POST', '/wpglib/v1/sync-projects' );
 		$response = $this->server->dispatch( $request );
@@ -153,6 +197,27 @@ class Custom_REST_Routes_Test extends WP_UnitTestCase {
 			['id' => '5', 'gl_project_id' => '4005', 'title' => ['rendered' => $names[4]], '_changed' => 'unchanged']
 		], $reduced_output );
 
+	}
+
+	public function test_sync_issues() {
+		// First of all sync projects
+		$request = new WP_REST_Request( 'POST', '/wpglib/v1/sync-projects' );
+		$response = $this->server->dispatch( $request );
+
+		$request = new WP_REST_Request( 'POST', '/wpglib/v1/sync-issues/4002' );
+		$response = $this->server->dispatch( $request );
+		$this->assertEquals( 200, $response->status );
+
+		$synced_issues = $response->data;
+		$this->assertEquals( 5, count( $synced_issues ) );
+		dump_issue_posts($synced_issues);
+		foreach( $synced_issues as $idx => $si ) {
+			$this->assertEquals( $idx + 100006, $si['gl_id'] );
+			$this->assertEquals( $idx + 1, $si['gl_iid'] );
+			$this->assertEquals( 'opened', $si['gl_state'] );
+			$this->assertEquals( '4002', $si['gl_project_id'] );
+			$this->assertEquals( 'created', $si['_changed'] );
+		}
 	}
 
 }

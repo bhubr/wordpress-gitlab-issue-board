@@ -103,8 +103,10 @@ class Gitlab_Issue_Board_API_Client {
 		$client = $this->get_client();
 	    $pager = new \Gitlab\ResultPager($client);
 	    $api = $client->api('issues');
+
+	    // echo "## get_all_issues " . $project_id . "\n";
 	    return $pager->fetchAll( $api, 'all', array(
-	    	'project_id' => $project_id, array( 'sort' => 'asc' )
+	    	$project_id, array( 'sort' => 'asc' )
     	) );
 	}
 

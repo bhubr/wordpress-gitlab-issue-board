@@ -120,13 +120,13 @@ function DataService($rootScope, $http, $q, _) {
     });;
   }
 
-  function syncIssues(postId) {
+  function syncIssues(projectId) {
     return $http({
       method: 'POST',
-      url: window.siteRoot + '/wp-json/wpglib/v1/sync-issues',
-      data: {
-        post_id: postId
-      },
+      url: window.siteRoot + '/wp-json/wpglib/v1/sync-issues/' + projectId,
+      // data: {
+      //   post_id: postId
+      // },
       headers: {
         'X-WP-Nonce': wpApiSettings.nonce
       }
