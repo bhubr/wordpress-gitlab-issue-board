@@ -72,6 +72,32 @@ class Custom_REST_Routes_Test extends WP_UnitTestCase {
 		$this->assertEquals( 4, count( $projects ) );
 	}
 
+	public function test_mock_backend_project_read_not_found() {
+		try {
+			$response = $this->client->request('GET', GITLAB_DOMAIN . '/api/v4/projects/99999');
+		} catch( \Exception $e ) {
+			$this->assertEquals( 404, $e->getCode() );
+		}
+		
+	}
+
+	public function test_mock_backend_project_update_not_found() {
+		try {
+			$response = $this->client->request('PUT', GITLAB_DOMAIN . '/api/v4/projects/99999', [
+				'json' => [ 'name_with_namespace' => 'new name' ]
+			]);
+		} catch( \Exception $e ) {
+			$this->assertEquals( 404, $e->getCode() );
+		}
+	}
+
+	public function test_mock_backend_project_delete_not_found() {
+		try {
+			$response = $this->client->request('DELETE', GITLAB_DOMAIN . '/api/v4/projects/99999');
+		} catch( \Exception $e ) {
+			$this->assertEquals( 404, $e->getCode() );
+		}
+	}
 
 	public function test_sync_projects() {
 		$request = new WP_REST_Request( 'POST', '/wpglib/v1/sync-projects' );
