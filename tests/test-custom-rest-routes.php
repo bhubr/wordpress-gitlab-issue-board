@@ -220,4 +220,20 @@ class Custom_REST_Routes_Test extends WP_UnitTestCase {
 		}
 	}
 
+	public function test_create_issue_cat() {
+		$issue_cat_attrs = [
+			'name' => 'Root cat #1',
+			'wp_post_id' => 1
+		];
+		echo "pouet\n";
+		$request = new WP_REST_Request( 'POST', '/wp/v2/issue_cat', $issue_cat_attrs );
+		$response = $this->server->dispatch( $request );
+echo "pouet\n";
+		$this->assertEquals( 200, $response->status );
+		$issue_cat_obj = $response->data;
+		$this->assertEquals( 'Root cat #1', $issue_cat_obj['name'] );
+		$this->assertEquals( '1', $issue_cat_obj['wp_post_id'] );
+
+	}
+
 }

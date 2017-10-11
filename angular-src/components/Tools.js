@@ -1,6 +1,6 @@
-ToolsController.$inject = ['$rootScope', '$http', '$timeout', 'lodash'];
+ToolsController.$inject = ['$rootScope', '$http', '$timeout', 'lodash', 'dataService'];
 
-function ToolsController($rootScope, $http, $timeout, _) {
+function ToolsController($rootScope, $http, $timeout, _, dataService) {
   var $ctrl = this;
 
   $ctrl.syncProjects = function() {

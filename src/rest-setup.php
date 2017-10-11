@@ -105,6 +105,22 @@ function register_fields() {
 			'schema'          => null,
 		)
 	 );
+	register_rest_field( 'issue_cat',
+	    'wp_project_id',
+	    array(
+	        'get_callback'    => '\\bhubr\\wp\\glib\\rest\\issue_cat_get_wp_project_id_field',
+	        'update_callback' => '\\bhubr\\wp\\glib\\rest\\issue_cat_update_wp_project_id_field',
+	        'schema' => null
+	    )
+	);
+}
+
+function issue_cat_get_wp_project_id_field() {
+
+}
+
+function issue_cat_update_wp_project_id_field() {
+	
 }
 
 
@@ -119,7 +135,7 @@ function get_db_record_field( $record_id, $field ) {
 	$result = array_pop( $results );
 	return (int) $result->$field;
 }
-function get_object_gitlab_id(  $object, $field_name, $request ) {
+function get_object_gitlab_id( $object, $field_name, $request ) {
 	return get_db_record_field( $object['id'], 'comment_count' );
 }
 
