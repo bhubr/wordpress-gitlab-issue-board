@@ -2,6 +2,19 @@
 
 namespace bhubr\wp\glib\wpdb_io;
 
+function get_wp_project_id( $gl_project_id ) {
+	global $wpdb;
+	$query = $wpdb->prepare( "SELECT ID FROM {$wpdb->prefix}posts WHERE post_type='project' and comment_count=%d", $gl_project_id );
+	$results = $wpdb->get_results( $query, ARRAY_A );
+	if( empty( $results ) ) {
+		error_log( "could not find parent project CPT with comment_count (project_id) = $gl_project_id" );
+	}
+	// var_dump($results);
+	if( empty($results)) {
+		throw new Exception("project for this issue can't be found in WP database");
+	}
+	return $results[0]['ID'];
+}
 /**
  * Inject a issue into db if it does not exist
  */
@@ -17,20 +30,7 @@ function import_one_issue( $issue_attrs ) {
 		}
 	}
 
-	/// post parent = id du post WORDPRESS!!!!!
-	// id gitlab dans une meta
-	global $wpdb;
-	$query = $wpdb->prepare( "SELECT ID FROM {$wpdb->prefix}posts WHERE post_type='project' and comment_count=%d", $issue_attrs['project_id'] );
-// var_dump($query);
-	$results = $wpdb->get_results( $query, ARRAY_A );
-	if( empty( $results ) ) {
-		error_log( "could not find parent project CPT with comment_count (project_id) = " . $issue_attrs['project_id'] );
-	}
-// var_dump($results);
-if( empty($results)) {
-	throw new Exception("project for this issue can't be found in WP database");
-}
-	$parent_wp_post_id = $results[0]['ID'];
+	$parent_wp_post_id = get_wp_project_id( $issue_attrs['project_id'] );
 	$id = wp_insert_post( [
 		'post_type'     => 'issue',
 		'post_status'   => 'publish',
@@ -75,8 +75,9 @@ if( empty($results)) {
  *
  * @param array $projects an array of projects given back by the GitLab API
  */
-function import_many_issues( $gitlab_issues ) {
-	$wp_posts = import_many_gitlab_objects( $gitlab_issues, 'issue' );
+function import_many_issues( $gitlab_issues, $gl_project_id ) {
+	$wp_project_id = get_wp_project_id( $gl_project_id );
+	$wp_posts = import_many_gitlab_objects( $gitlab_issues, 'issue', [ 'post_parent' => $wp_project_id ] );
 	return $wp_posts;
 }
 

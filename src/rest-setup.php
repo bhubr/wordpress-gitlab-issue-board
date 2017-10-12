@@ -244,7 +244,7 @@ function sync_gitlab_issues_to_wp( \WP_REST_Request $request ) {
 		return new \WP_REST_Response( [ 'error' => $e->getMessage() ], 500 );
 	}
 
-	$results = wpdb_io\import_many_issues( $issues );
+	$results = wpdb_io\import_many_issues( $issues, $params['id'] );
 	$mapped = map_wp_issues_fields( $results );
 
 	return new \WP_REST_Response( $mapped, 200 );

@@ -68,7 +68,7 @@ function update_record( $wp_post, $attrs ) {
 	$wpdb->query( $query );
 }
 
-function import_many_gitlab_objects( $gitlab_objects, $type ) {
+function import_many_gitlab_objects( $gitlab_objects, $type, $where ) {
 	$import_func = "\\bhubr\\wp\\glib\\wpdb_io\\import_one_{$type}";
 	$id_status_change_map = [];
 	foreach( $gitlab_objects as $record ) {
@@ -76,7 +76,7 @@ function import_many_gitlab_objects( $gitlab_objects, $type ) {
 		$id_status_change_map[ $wp_id ] = $status;
 	}
 
-	$wp_posts = query_all_records( $type );
+	$wp_posts = query_all_records( $type, $where );
 	foreach ( $wp_posts as $idx => $p ) {
 		if( ! isset( $id_status_change_map[ $p['ID'] ] ) ) {
 			error_log( sprintf( "not found, trash: %d  %s", $p['ID'], $p['post_title'], $p['guid'] ) );
@@ -94,10 +94,17 @@ function import_many_gitlab_objects( $gitlab_objects, $type ) {
 }
 
 
-function query_all_records( $type ) {
+function query_all_records( $type, $where_criteria ) {
 	global $wpdb;
+	$select = "SELECT * FROM {$wpdb->prefix}posts";
+	$where = "post_type='{$type}' AND post_status IN('publish','draft')";
+	foreach ($where_criteria as $key => $value) {
+		$quoted_value = is_int( $value ) ? $value : "'$value'";
+		$where .= " AND $key=$quoted_value";
+	}
+	error_log("query_all_records: " . "$select WHERE $where");
 	$results = $wpdb->get_results(
-		"SELECT * FROM {$wpdb->prefix}posts WHERE post_type='{$type}' AND post_status IN('publish','draft')", ARRAY_A
+		"$select WHERE $where", ARRAY_A
 	);
 	return $results;
 }
