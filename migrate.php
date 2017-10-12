@@ -29,8 +29,8 @@ foreach( $issues as $issue ) {
 		"UPDATE {$wpdb->prefix}posts SET comment_count=%d, menu_order=%d, post_parent=%d WHERE ID=%d", $gitlab_id, $gitlab_iid, 110, $wp_id
 	);
 	$wpdb->query( $query );
-	echo "DONE #1 (CPT metas)\n\n";
 }
+echo "DONE #1 (CPT metas)\n\n";
 
 
 // // 2 - postmeta keys

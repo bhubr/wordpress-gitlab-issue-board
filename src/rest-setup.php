@@ -199,8 +199,17 @@ function map_wp_post_fields_project( $record ) {
 }
 
 function map_wp_post_fields_issue( $record ) {
+	$related_terms = [];
+	foreach( ['issue_cat', 'issue_label'] as $taxonomy ) {
+		$terms = wp_get_post_terms( $record['ID'], $taxonomy );
+		$term_ids = array_map( function( $term ) {
+			return $term->term_id;
+		}, $terms );
+		$related_terms[ $taxonomy ] = $term_ids;
+	}
 	return  array_merge(
 		map_wp_post_fields($record),
+		$related_terms,
 		[
 			'wp_project_id' => $record['post_parent'],
 			'gl_id' => $record['comment_count'],
@@ -286,7 +295,7 @@ function get_board( \WP_REST_Request $request ) {
 	// }, $all_project_terms );
 
 	return new \WP_REST_Response( [
-		'issues' => $issues,
+		'issues' => map_wp_issues_fields( $issues ),
 		'issueCats' => map_wp_issue_terms_fields( $issue_cats ),
 		'issueLabels' => map_wp_issue_terms_fields( $issue_labels )
 	], 200 );
