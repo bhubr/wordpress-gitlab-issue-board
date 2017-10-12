@@ -94,7 +94,7 @@ function import_many_gitlab_objects( $gitlab_objects, $type, $where = [] ) {
 }
 
 
-function query_all_records( $type, $where_criteria ) {
+function query_all_records( $type, $where_criteria = [] ) {
 	global $wpdb;
 	$select = "SELECT * FROM {$wpdb->prefix}posts";
 	$where = "post_type='{$type}' AND post_status IN('publish','draft')";
