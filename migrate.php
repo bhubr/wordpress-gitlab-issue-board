@@ -10,7 +10,7 @@ use bhubr\wp\glib\wpdb_io;
 
 $issues = wpdb_io\query_all_records( 'issue_cat', [] );
 
-foreach( $issue as $issue ) {
+foreach( $issues as $issue ) {
 	$wp_id = $issue['ID'];
 	$gitlab_id = (int) get_post_meta( $wp_id, 'gl_id', true );
 	$gitlab_iid = (int) get_post_meta( $wp_id, 'gl_iid', true );
