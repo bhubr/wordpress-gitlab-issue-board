@@ -29,13 +29,13 @@ foreach( $issues as $issue ) {
 		"UPDATE {$wpdb->prefix}posts SET comment_count=%d, menu_order=%d post_parent=%d WHERE ID=%d", $gitlab_id, $gitlab_iid, 110, $wp_id
 	);
 	$wpdb->query( $query );
-	echo "DONE #1 (CPT metas)\n";
+	echo "DONE #1 (CPT metas)\n\n";
 }
 
 
 // 2 - postmeta keys
 $wpdb->query( "UPDATE {$wpdb->prefix}postmeta SET meta_key='gl_project_id' WHERE meta_key='gl_pid'" );
-echo "DONE #2 (meta keys changed)\n";
+echo "DONE #2 (meta keys changed)\n\n";
 
 
 // 3 - terms wp post id
@@ -49,6 +49,9 @@ $labels = get_terms( [
 ] );
 $all_terms = array_merge( $cats, $labels );
 foreach( $all_terms as $term ) {
+	printf(
+		"%4d %s\n", $term->term_id, $term->name
+	);
 	add_term_meta( $term->term_id, 'wp_project_id', 110, true );
 }
 
