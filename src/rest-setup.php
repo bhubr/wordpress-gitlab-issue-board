@@ -261,6 +261,24 @@ function cleanup_posts_terms( \WP_REST_Request $request ) {
 	return new \WP_REST_Response( ['success' => true], 200 );
 }
 
+function get_board( \WP_REST_Request $request ) {
+	$params = $request->get_url_params();
+	$wp_project_id = $params['id'];
+
+	$issues = wpdb_io\query_all_records( 'issue', ['post_parent' => $wp_project_id] );
+	$issue_cats = wpdb_io\query_project_custom_terms( 'issue_cat', $wp_project_id );
+	$issue_labels = wpdb_io\query_project_custom_terms( 'issue_label', $wp_project_id );
+	// $issue_cats = array_filter( function( $term ) {
+	// 	return $term[]
+	// }, $all_project_terms );
+
+	return new \WP_REST_Response( [
+		'issues' => $issues,
+		'issueCats' => $issue_cats,
+		'issueLabels' => $issue_labels
+	], 200 );
+}
+
 /**
  * REST routes
  */
@@ -268,6 +286,10 @@ function register_routes() {
     register_rest_route( 'wpglib/v1', '/cleanup', array(
         'methods' => 'DELETE',
         'callback' => '\\bhubr\\wp\\glib\\rest\\cleanup_posts_terms'
+    ));
+    register_rest_route( 'wpglib/v1', '/board/(?P<id>\d+)', array(
+        'methods' => 'GET',
+        'callback' => '\\bhubr\\wp\\glib\\rest\\get_board'
     ));
     register_rest_route( 'wpglib/v1', '/sync-projects', array(
         'methods' => 'POST',

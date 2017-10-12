@@ -36,7 +36,7 @@ function ToolsController($rootScope, $http, $timeout, _, dataService) {
   $ctrl.cleanup = function() {
     $http({
       method: 'DELETE',
-      url: window.siteRoot + '/wp-json/wpglib/v1/cleanup'
+      url: window.wpglib.siteRoot + '/wp-json/wpglib/v1/cleanup'
     })
     .then(function(response) {
       console.log('after cleanup', response.data);
@@ -45,7 +45,7 @@ function ToolsController($rootScope, $http, $timeout, _, dataService) {
 }
 
 module.exports = {
-  templateUrl: window.templatesRoot + '/tools.html',
+  templateUrl: window.wpglib.templatesRoot + '/tools.html',
   controller: ToolsController,
   bindings: {
     issues: '=',

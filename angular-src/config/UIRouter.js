@@ -12,7 +12,16 @@ function UIRouterConfig(
   $httpProvider
 ) {
 
-  $urlRouterProvider.otherwise('/tools');
+  var defaultProjectId = localStorage.getItem('defaultProjectId');
+  if( null !== defaultProjectId ) {
+    defaultProjectId = parseInt( defaultProjectId, 10 )
+  }
+  else if(wpglib.projects.length > 0) {
+    defaultProjectId = wpglib.projects[0].id;
+  }
+  var defaultUrl = ! defaultProjectId ? '/tools' : '/';
+
+  $urlRouterProvider.otherwise(defaultUrl);
 
   var states = [
     {
@@ -20,19 +29,13 @@ function UIRouterConfig(
       url: '/',
       component: 'board',
       resolve: {
-        issues: [
+        board: [
           'dataService', function(dataService) {
-            return dataService.getIssues();
-          }
-        ],
-        issueCats: [
-          'dataService', function(dataService) {
-            return dataService.getIssueCats();
-          }
-        ],
-        issueLabels: [
-          'dataService', function(dataService) {
-            return dataService.getIssueLabels();
+            return dataService.getBoard(defaultProjectId)
+            .then(function(data) {
+              console.log('board data', data);
+              return Object.assign(data, { projectId: defaultProjectId });
+            });
           }
         ]
       }

@@ -46,6 +46,7 @@ function import_one_issue( $issue_attrs ) {
 		// die("could not create post");
 	}
 
+	global $wpdb;
 	$query = $wpdb->prepare( "UPDATE {$wpdb->prefix}posts SET comment_count=%d WHERE ID=%d", $issue_attrs['id'], $id );
 	$wpdb->query( $query );
 
@@ -86,7 +87,7 @@ function compare_issue_attributes( $record, $new_attrs ) {
 		'post_title'   => 'title',
 		'post_content' => 'description',
 		'guid'         => 'web_url',
-		'post_parent'  => 'project_id',
+		// 'post_parent'  => 'project_id',
 		'menu_order'   => 'iid',
 	];
 	$updated_attrs = compare_record_attributes( $record, $new_attrs, $key_mapping );

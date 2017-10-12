@@ -119,7 +119,13 @@ class Gitlab_Issue_Board {
 			return;
 		}
 		$templates_url = plugins_url( 'templates/', __FILE__ );
-		echo '<script type="text/javascript">window.templatesRoot = "' . $templates_url . '"; window.siteRoot = "' . site_url() . '";</script>';
+		$vars = [
+			'siteRoot'      => site_url(),
+			'templatesRoot' => $templates_url,
+			'projects'      => $this->get_projects()
+		];
+		$encoded_vars = json_encode( $vars );
+		echo '<script type="text/javascript">window.wpglib = JSON.parse(\'' . $encoded_vars . '\');console.log(window.wpglib);</script>';
 		wp_enqueue_script( 'wpglib_vendor', plugins_url( 'js/wpglib-vendor.bundle.js', __FILE__ ), array( 'jquery' ), '1.0.0' );
 		wp_enqueue_script( 'wpglib_app', plugins_url( 'js/wpglib-app.bundle.js', __FILE__ ), array( 'wpglib_vendor' ), '1.0.0' );
 		wp_enqueue_style( 'wpglib_styles', plugins_url( 'css/wpglib-styles.min.css', __FILE__ ), array(), '1.0.0' );
@@ -162,6 +168,25 @@ class Gitlab_Issue_Board {
 			$this->configurator->display_config_form();
 		}
 
+	}
+
+
+	public function get_projects() {
+		$user = wp_get_current_user();
+		$projects = get_posts([
+			'post_type'   => 'project',
+			'post_author' => $user->ID,
+			'oderby'      => 'ID',
+			'order'       => 'ASC',
+			'numberposts' => 100
+		]);
+		return array_map( function( $p ) {
+			return [
+				'id'    => $p->ID,
+				'title' => $p->post_title,
+				'slug'  => $p->post_name
+			];
+		}, $projects );
 	}
 
 

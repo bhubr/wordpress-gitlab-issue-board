@@ -5,6 +5,9 @@
   <a href="#" ng-click="$ctrl.filterIssues('opened')">Opened</a> |
   <a href="#" ng-click="$ctrl.filterIssues('closed')">Closed</a>
 </span>
+<strong>Actions:</strong> <span class="_pull-right">
+  <a href="#" ng-click="$ctrl.createCat()">Create list</a>
+</span>
 <div>
   <div class="board-list" ng-class="{ collapsed: cat._collapsed }" ng-repeat="cat in $ctrl.rootCats">
   <span class="expand-collapse" ng-click="cat._collapsed = ! cat._collapsed">{{ cat._collapsed ? '&raquo;' : '&laquo;' }}</span>

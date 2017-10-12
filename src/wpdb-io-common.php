@@ -68,7 +68,7 @@ function update_record( $wp_post, $attrs ) {
 	$wpdb->query( $query );
 }
 
-function import_many_gitlab_objects( $gitlab_objects, $type, $where ) {
+function import_many_gitlab_objects( $gitlab_objects, $type, $where = [] ) {
 	$import_func = "\\bhubr\\wp\\glib\\wpdb_io\\import_one_{$type}";
 	$id_status_change_map = [];
 	foreach( $gitlab_objects as $record ) {
@@ -99,7 +99,7 @@ function query_all_records( $type, $where_criteria ) {
 	$select = "SELECT * FROM {$wpdb->prefix}posts";
 	$where = "post_type='{$type}' AND post_status IN('publish','draft')";
 	foreach ($where_criteria as $key => $value) {
-		$quoted_value = is_int( $value ) ? $value : "'$value'";
+		$quoted_value = is_numeric( $value ) ? $value : "'$value'";
 		$where .= " AND $key=$quoted_value";
 	}
 	error_log("query_all_records: " . "$select WHERE $where");
@@ -109,5 +109,24 @@ function query_all_records( $type, $where_criteria ) {
 	return $results;
 }
 
-
-
+function query_project_custom_terms( $taxonomy, $wp_project_id ) {
+	global $wpdb;
+	$metas = $wpdb->get_results(
+		"SELECT term_id FROM {$wpdb->prefix}termmeta WHERE meta_key='wp_project_id' and meta_value='$wp_project_id'"
+	);
+	$term_ids = array_map( function( $meta ) {
+		return $meta->term_id;
+	}, $metas );
+	$where = empty( $term_ids ) ? '' : 'AND term_id IN (' . implode( ',', $term_ids ) . ')';
+	$term_tax_entries = $wpdb->get_results(
+		"SELECT term_id FROM {$wpdb->prefix}term_taxonomy WHERE taxonomy ='$taxonomy' $where"
+	);
+	$term_ids = array_map( function( $meta ) {
+		return $meta->term_id;
+	}, $term_tax_entries );
+	$where = empty( $term_ids ) ? '(0)' : '(' . implode( ',', $term_ids ) . ')';
+	$terms = $wpdb->get_results(
+		"SELECT * FROM {$wpdb->prefix}terms WHERE term_id IN $where", ARRAY_A
+	);
+	return $terms;
+}

@@ -37,8 +37,21 @@ function BoardController($rootScope, $http, $timeout, _, dataService) {
     rootCat.childCats.forEach(filterChildIssues);
   }
 
+  $ctrl.createList = function() {
+    $http.post(window.siteRoot + '/wp-json/wp/v2/issue_cat', {
+      name: 'New cat', wp_project_id: $ctrl.projectId
+    });
+  }
+
 
   $timeout(function() {
+
+    console.log('board content', $ctrl, $ctrl.board);
+    $ctrl.issues = $ctrl.board.issues;
+    $ctrl.issueCats = $ctrl.board.issueCats;
+    $ctrl.issueLabels = $ctrl.board.issueLabels;
+    $ctrl.projectId = $ctrl.board.projectId;
+
 
     // Sort out root cats (boards) and 2nd-level cats (cards)
     $ctrl.rootCats = $ctrl.issueCats.filter(function(cat) {
@@ -139,11 +152,9 @@ function BoardController($rootScope, $http, $timeout, _, dataService) {
 }
 
 module.exports = {
-  templateUrl: window.templatesRoot + '/board.html',
+  templateUrl: window.wpglib.templatesRoot + '/board.html',
   controller: BoardController,
   bindings: {
-    issues: '=',
-    issueCats: '=',
-    issueLabels: '='
+    board: '='
   }
 };

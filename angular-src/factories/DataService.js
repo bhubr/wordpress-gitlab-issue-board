@@ -38,7 +38,7 @@ function DataService($rootScope, $http, $q, _) {
     // alertPending();
     return $http({
       method: 'POST',
-      url: window.siteRoot + '/wp-json/wp/v2/' + type,
+      url: window.wpglib.siteRoot + '/wp-json/wp/v2/' + type,
       data: data,
       headers: {
         'X-WP-Nonce': wpApiSettings.nonce
@@ -54,7 +54,7 @@ function DataService($rootScope, $http, $q, _) {
     // alertPending();
     return $http({
       method: 'PUT',
-      url: window.siteRoot + '/wp-json/wp/v2/' + type + '/' + data.id,
+      url: window.wpglib.siteRoot + '/wp-json/wp/v2/' + type + '/' + data.id,
       data: data,
       headers: {
         'X-WP-Nonce': wpApiSettings.nonce
@@ -72,7 +72,7 @@ function DataService($rootScope, $http, $q, _) {
     //   return $q.when(cached[type]);
     // }
     // alertPending();
-    var url = window.siteRoot + '/wp-json/wp/v2/' + type;
+    var url = window.wpglib.siteRoot + '/wp-json/wp/v2/' + type;
     if (args) {
       url += '?' + serialize(args);
     }
@@ -109,7 +109,7 @@ function DataService($rootScope, $http, $q, _) {
   function syncProjects() {
     return $http({
       method: 'POST',
-      url: window.siteRoot + '/wp-json/wpglib/v1/sync-projects',
+      url: window.wpglib.siteRoot + '/wp-json/wpglib/v1/sync-projects',
       data: {},
       headers: {
         'X-WP-Nonce': wpApiSettings.nonce
@@ -123,7 +123,7 @@ function DataService($rootScope, $http, $q, _) {
   function syncIssues(projectId) {
     return $http({
       method: 'POST',
-      url: window.siteRoot + '/wp-json/wpglib/v1/sync-issues/' + projectId,
+      url: window.wpglib.siteRoot + '/wp-json/wpglib/v1/sync-issues/' + projectId,
       // data: {
       //   post_id: postId
       // },
@@ -134,6 +134,13 @@ function DataService($rootScope, $http, $q, _) {
     .then(function(response) {
       return response.data;
     });;
+  }
+
+  function getBoard(wpProjectId) {
+    return $http.get(window.wpglib.siteRoot + '/wp-json/wpglib/v1/board/' + wpProjectId)
+    .then(function(response) {
+      return response.data;
+    })
   }
 
   function getIssues() {
@@ -158,11 +165,13 @@ function DataService($rootScope, $http, $q, _) {
     return getResources('issue_label');
   }
 
+
   // function getCached(resourceName) {
   //   return cached[resourceName];
   // }
 
   return {
+    getBoard: getBoard,
     getProjects: getProjects,
     syncProjects: syncProjects,
     syncIssues: syncIssues,
