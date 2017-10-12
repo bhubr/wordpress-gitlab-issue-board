@@ -32,11 +32,23 @@ function ToolsController($rootScope, $http, $timeout, _, dataService) {
       console.log('created resource', resource)
     })
   }
+
+  $ctrl.cleanup = function() {
+    $http({
+      method: 'DELETE',
+      url: window.siteRoot + '/wp-json/wpglib/v1/cleanup'
+    })
+    .then(function(response) {
+      console.log('after cleanup', response.data);
+    })
+  }
 }
 
 module.exports = {
   templateUrl: window.templatesRoot + '/tools.html',
   controller: ToolsController,
   bindings: {
+    issues: '=',
+    projects: '='
   }
 };

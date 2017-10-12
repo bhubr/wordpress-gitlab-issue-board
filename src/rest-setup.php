@@ -149,7 +149,6 @@ function get_object_gitlab_id( $object, $field_name, $request ) {
 }
 
 function get_issue_iid( $object, $field_name, $request ) {
-	echo "get_issue_iid $field_name\n";
 	return get_db_record_field( $object['id'], 'menu_order' );
 }
 
@@ -251,10 +250,25 @@ function sync_gitlab_issues_to_wp( \WP_REST_Request $request ) {
 	return new \WP_REST_Response( $mapped, 200 );
 }
 
+function cleanup_posts_terms( \WP_REST_Request $request ) {
+	require 'cleanup.php';
+	foreach( ['issue_cat', 'issue_label'] as $taxonomy ) {
+		clean_taxonomy_terms( $taxonomy );
+	}
+	foreach( ['issue', 'project'] as $post_type ) {
+		clean_custom_posts( $post_type );
+	}
+	return new \WP_REST_Response( ['success' => true], 200 );
+}
+
 /**
  * REST routes
  */
 function register_routes() {
+    register_rest_route( 'wpglib/v1', '/cleanup', array(
+        'methods' => 'DELETE',
+        'callback' => '\\bhubr\\wp\\glib\\rest\\cleanup_posts_terms'
+    ));
     register_rest_route( 'wpglib/v1', '/sync-projects', array(
         'methods' => 'POST',
         'callback' => '\\bhubr\\wp\\glib\\rest\\sync_gitlab_projects_to_wp'

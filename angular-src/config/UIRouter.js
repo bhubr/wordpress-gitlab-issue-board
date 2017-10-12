@@ -40,7 +40,19 @@ function UIRouterConfig(
     {
       name: 'tools',
       url: '/tools',
-      component: 'tools'
+      component: 'tools',
+      resolve: {
+        issues: [
+          'dataService', function(dataService) {
+            return dataService.getIssues();
+          }
+        ],
+        projects: [
+          'dataService', function(dataService) {
+            return dataService.getProjects();
+          }
+        ]
+      }
     }
   ];
   states.forEach(function(state) {

@@ -19,7 +19,7 @@ function record_already_exists( $record, $post_type ) {
 	$results = $wpdb->get_results( $query, ARRAY_A );
 	if( ! empty( $results ) ) {
 		$post = $results[0];
-		error_log( sprintf( "record_already_exists: %d %s %s", $post['ID'], $post['post_title'], $post['guid'] ) );
+		error_log( sprintf( "record_already_exists: %d (%s) %s %s", $post['ID'], gettype( $post['ID'] ), $post['post_title'], $post['guid'] ) );
 	}
 	return empty( $results ) ? false : $results[0];
 }
@@ -33,13 +33,14 @@ function compare_record_attributes( $record, $new_attrs, $key_mapping ) {
 
 	foreach( $key_mapping as $post_key => $attr_key ) {
 		if( isset( $new_attrs[ $attr_key ] ) &&
-			$record[ $post_key ] !== $new_attrs[ $attr_key ]
+			$record[ $post_key ] != $new_attrs[ $attr_key ]
 		) {
+			error_log( sprintf( '$record[ $post_key ] !== $new_attrs[ $attr_key ] %s %s %s %s', $record[ $post_key ], gettype( $record[ $post_key ] ), $new_attrs[ $attr_key ], gettype( $new_attrs[ $attr_key ] ) ) );
 			$attrs_updated[ $post_key ] = $new_attrs[ $attr_key ];
 		}
 	}
 	if( ! empty( $attrs_updated ) ) {
-		error_log( sprintf( "compare_record_attributes, changed: %s", implode( ',', array_keys( $attrs_updated ) ) ) );
+		error_log( sprintf( "compare_record_attributes, changed: %s %s", implode( ',', array_keys( $attrs_updated ) ), print_r( $attrs_updated, true ) ) );
 	}
 	return $attrs_updated;
 }

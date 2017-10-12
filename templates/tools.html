@@ -5,6 +5,7 @@
 <h3>Projects</h3>
 
 <button ng-click="$ctrl.syncProjects()" class="button button-primary">Sync. projects</button>
+<button ng-click="$ctrl.cleanup()" class="button" style="background: #b42;border: 1px solid #c42; color: #fff">RESET</button>
 <ul class="synced-items-list">
   <li ng-repeat="p in $ctrl.projects" class="{{ p._changed }}">{{ p.id }} - {{ p.gl_project_id }} - {{ p.title.rendered }} <a href="#" ng-click="$ctrl.syncIssues(p.gl_project_id)">sync</a> <a href="#" ng-click="$ctrl.createIssueCat(p.id)">create issue_cat</a></li>
 </ul>
