@@ -25,6 +25,7 @@
 
       <issue-editor ng-if="child._isEditing" issue="$ctrl.issueEditing" on-cancel="$ctrl.cancelEditing()" on-submit="$ctrl.saveIssue()"></issue-editor>
     </div>
+    <form class="inline add-list-form" ng-submit="$ctrl.createCard(cat)"><input class="bare" ng-model="$ctrl.data.cardName" /><button type="submit" class="btn-bare">Add card</button></form>
   </div>
 
   <div class="issue-list">

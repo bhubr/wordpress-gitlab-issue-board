@@ -126,6 +126,8 @@ class Gitlab_Issue_Board {
 		];
 		$encoded_vars = json_encode( $vars );
 		echo '<script type="text/javascript">window.wpglib = JSON.parse(\'' . $encoded_vars . '\');console.log(window.wpglib);</script>';
+		wp_enqueue_script( 'jquery-ui-draggable' );
+		wp_enqueue_script( 'jquery-ui-droppable' );
 		wp_enqueue_script( 'wpglib_vendor', plugins_url( 'js/wpglib-vendor.bundle.js', __FILE__ ), array( 'jquery' ), '1.0.0' );
 		wp_enqueue_script( 'wpglib_app', plugins_url( 'js/wpglib-app.bundle.js', __FILE__ ), array( 'wpglib_vendor' ), '1.0.0' );
 		wp_enqueue_style( 'wpglib_styles', plugins_url( 'css/wpglib-styles.min.css', __FILE__ ), array(), '1.0.0' );

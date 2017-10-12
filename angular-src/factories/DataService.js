@@ -135,7 +135,7 @@ function DataService($rootScope, $http, $q, _) {
     })
   }
 
-  function createList( data ) {
+  function createIssueCat( data ) {
     return post('/wp/v2/issue_cat', data);
   }
   function syncIssues(projectId) {
@@ -190,7 +190,7 @@ function DataService($rootScope, $http, $q, _) {
 
   return {
     getBoard: getBoard,
-    createList: createList,
+    createIssueCat: createIssueCat,
     getProjects: getProjects,
     syncProjects: syncProjects,
     syncIssues: syncIssues,

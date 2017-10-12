@@ -3,6 +3,7 @@
 	"devDependencies": {
 		"@uirouter/angularjs": "^1.0.6",
 		"angular": "^1.6.6",
+		"angular-dragdrop": "^1.0.13",
 		"grunt": "^1.0.1",
 		"grunt-contrib-compress": "^1.4.3",
 		"grunt-contrib-cssmin": "^2.2.1",

@@ -13,7 +13,8 @@ module.exports = {
     vendor: [
       'angular',
       '@uirouter/angularjs',
-      'ng-lodash'
+      'ng-lodash',
+      'angular-dragdrop'
     ]
   },
   output: {
@@ -22,7 +23,7 @@ module.exports = {
   },
   plugins: [
     new webpack.optimize.CommonsChunkPlugin({ name: "vendor", filename: "wpglib-vendor.bundle.js" }),
-    new UglifyJSPlugin()
+    // new UglifyJSPlugin()
   ],
 
   cache: false

@@ -40,15 +40,20 @@
 .board-list .expand-collapse {
   float: right;
 }
+.board-list .add-list-form,
 .board-card .add-issue-btn {
   height: 0;
-  transition: height 0.4s;
+  transition: height 1.4s;
   overflow: hidden;
 }
 .board-card:hover .add-issue-btn {
   background: #ddd;
   height: auto;
 }
+.board-list:hover .add-list-form {
+  height: auto;
+}
+
 .issue-item {
   padding: 1px 3px;
 }

@@ -22,7 +22,7 @@ function IssueEditorController($http, $timeout, _, dataService) {
 }
 
 module.exports = {
-  templateUrl: window.templatesRoot + '/issue-editor.html',
+  templateUrl: window.wpglib.templatesRoot + '/issue-editor.html',
   controller: IssueEditorController,
   bindings: {
     issue: '=',

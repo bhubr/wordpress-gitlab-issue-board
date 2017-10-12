@@ -8,7 +8,8 @@ function BoardController($rootScope, $http, $timeout, _, dataService) {
   $ctrl.issueEditing = null;
   $ctrl.parentCatEditing = null;
   $ctrl.data = {
-    listName: ''
+    listName: '',
+    cardName: ''
   };
 
   $ctrl.filterIssues = function( state ) {
@@ -42,7 +43,7 @@ function BoardController($rootScope, $http, $timeout, _, dataService) {
 
   $ctrl.createList = function() {
     console.log('createList', $ctrl.projectId);
-    dataService.createList({
+    dataService.createIssueCat({
       name: $ctrl.data.listName,
       wp_project_id: $ctrl.projectId
     })
@@ -50,7 +51,19 @@ function BoardController($rootScope, $http, $timeout, _, dataService) {
       console.log(issueCat);
       $ctrl.rootCats.push(issueCat);
     });
+  };
 
+  $ctrl.createCard = function(parentCat) {
+    console.log('createCard', $ctrl.projectId, parentCat.id);
+    dataService.createIssueCat({
+      name: $ctrl.data.cardName,
+      parent: parentCat.id,
+      wp_project_id: $ctrl.projectId
+    })
+    .then(function(issueCat) {
+      console.log(issueCat);
+      parentCat.childCats.push(issueCat);
+    });
   };
 
 
@@ -84,7 +97,7 @@ function BoardController($rootScope, $http, $timeout, _, dataService) {
 
     var issue = _.find($ctrl.issues, { id: droppedIssueId });
     var issueIdx = $ctrl.issues.indexOf(issue);
-
+console.log('drop issue', issue);
     issue.issue_cat.push(targetCatId);
 
     dataService.updateResource('issue', issue)
