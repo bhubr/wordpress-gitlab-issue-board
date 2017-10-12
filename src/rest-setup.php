@@ -157,8 +157,8 @@ function get_issue_wp_post_id( $object, $field_name, $request ) {
 }
 
 function map_wp_post_fields( $record ) {
-	return [
-		'id'            => $record['ID'],
+	$mapped = [
+		'id'            => (int) $record['ID'],
 		'slug'          => $record['post_name'],
 		'type'          => $record['post_type'],
 		'status'        => $record['post_status'],
@@ -175,9 +175,13 @@ function map_wp_post_fields( $record ) {
 		],
 		'guid'          =>  [
 			'rendered'  => $record['guid']
-		],
-		'_changed'      => $record['_changed'],
+		]
 	];
+
+	if( isset( $record['_changed'] ) ) {
+		$mapped['_changed'] = $record['_changed'];
+	}
+	return $mapped;
 }
 
 function map_wp_issue_term_fields( $record ) {
@@ -211,11 +215,11 @@ function map_wp_post_fields_issue( $record ) {
 		map_wp_post_fields($record),
 		$related_terms,
 		[
-			'wp_project_id' => $record['post_parent'],
-			'gl_id' => $record['comment_count'],
-			'gl_iid' => $record['menu_order'],
+			'wp_project_id' => (int) $record['post_parent'],
+			'gl_id' => (int) $record['comment_count'],
+			'gl_iid' => (int) $record['menu_order'],
 			'gl_state' => get_post_meta( $record['ID'], 'gl_state', true ),
-			'gl_project_id' => get_post_meta( $record['ID'], 'gl_project_id', true )
+			'gl_project_id' => (int) get_post_meta( $record['ID'], 'gl_project_id', true )
 		]
 	);
 }

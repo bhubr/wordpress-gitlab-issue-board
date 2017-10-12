@@ -1,0 +1,13 @@
+<h4>{{ $ctrl.issue.id ? 'Edit issue' : 'New issue' }}</h4>
+
+<input type="text" placeholder="issue title" ng-model="$ctrl.issue._title" />
+
+<textarea type="text" placeholder="issue description" ng-model="$ctrl.issue._description"></textarea>
+
+<select name="singleSelect" ng-model="$ctrl.issue.gl_state">
+  <option value="opened">Opened</option>
+  <option value="closed">Closed</option>
+</select>
+
+<button class="wpgli-btn btn-ok" ng-click="$ctrl.handleSubmit()">OK</button>
+<button class="wpgli-btn btn-cancel" ng-click="$ctrl.handleCancel()">Cancel</button>
