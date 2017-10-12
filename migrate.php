@@ -8,7 +8,7 @@ if ( php_sapi_name() !== "cli" ) {
 
 use bhubr\wp\glib\wpdb_io;
 
-$issues = wpdb_io\query_all_records( 'issue_cat', [] );
+$issues = wpdb_io\query_all_records( 'issue', [] );
 
 foreach( $issues as $issue ) {
 	$wp_id = $issue['ID'];
