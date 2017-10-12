@@ -16,5 +16,5 @@ foreach( $issues as $issue ) {
 	$gitlab_iid = (int) get_post_meta( $wp_id, 'gl_iid', true );
 	$gitlab_pid = (int) get_post_meta( $wp_id, 'gl_pid', true );
 	$gitlab_state = (int) get_post_meta( $wp_id, 'gl_state', true );
-	printf("%4d %s --- GitLab params - id: %d, iid: %d, pid: %d, state: %s\n", $wp_id, $gitlab_id, $gitlab_iid, $gl_pid, $gl_state );
+	printf("%4d %s --- GitLab params - id: %d, iid: %d, pid: %d, state: %s\n", $wp_id, $issue['post_title'], $gitlab_id, $gitlab_iid, $gl_pid, $gl_state );
 }
