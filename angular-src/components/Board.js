@@ -7,6 +7,9 @@ function BoardController($rootScope, $http, $timeout, _, dataService) {
   $ctrl.rootCats = [];
   $ctrl.issueEditing = null;
   $ctrl.parentCatEditing = null;
+  $ctrl.data = {
+    listName: ''
+  };
 
   $ctrl.filterIssues = function( state ) {
     if( state ) {
@@ -18,7 +21,7 @@ function BoardController($rootScope, $http, $timeout, _, dataService) {
         return issue.gl_state === $ctrl.stateFilter &&
           issue.issue_cat.length === 0;
       });
-  }
+  };
 
 
   function filterChildIssues(cat) {
@@ -38,15 +41,21 @@ function BoardController($rootScope, $http, $timeout, _, dataService) {
   }
 
   $ctrl.createList = function() {
-    $http.post(window.siteRoot + '/wp-json/wp/v2/issue_cat', {
-      name: 'New cat', wp_project_id: $ctrl.projectId
+    console.log('createList', $ctrl.projectId);
+    dataService.createList({
+      name: $ctrl.data.listName,
+      wp_project_id: $ctrl.projectId
+    })
+    .then(function(issueCat) {
+      console.log(issueCat);
+      $ctrl.rootCats.push(issueCat);
     });
-  }
+
+  };
 
 
   $timeout(function() {
 
-    console.log('board content', $ctrl, $ctrl.board);
     $ctrl.issues = $ctrl.board.issues;
     $ctrl.issueCats = $ctrl.board.issueCats;
     $ctrl.issueLabels = $ctrl.board.issueLabels;
@@ -58,7 +67,7 @@ function BoardController($rootScope, $http, $timeout, _, dataService) {
       return cat.parent === 0;
     });
     $ctrl.rootCats.forEach(filterChildCategories);
-
+    console.log('board content', $ctrl, $ctrl.board);
     // Filter issues
     $ctrl.filterIssues('opened');
 
@@ -85,7 +94,7 @@ function BoardController($rootScope, $http, $timeout, _, dataService) {
       $ctrl.issues[issueIdx] = updatedIssue;
       $ctrl.filterIssues();
     });
-  }
+  };
 
   $ctrl.editIssue = function(parentCat, issue) {
     if($ctrl.parentCatEditing !== null) {
@@ -98,13 +107,13 @@ function BoardController($rootScope, $http, $timeout, _, dataService) {
       _description: ''
     };
     console.log('editIssue', $ctrl.issueEditing);
-  }
+  };
 
   $ctrl.cancelEditing = function() {
     $ctrl.parentCatEditing._isEditing = false;
     $ctrl.parentCatEditing = null;
     $ctrl.issueEditing = null;
-  }
+  };
 
   $ctrl.saveIssue = function() {
 
@@ -131,7 +140,7 @@ function BoardController($rootScope, $http, $timeout, _, dataService) {
         $ctrl.cancelEditing();
         $rootScope.$emit('alertOn', {
           class: 'success', text: 'Issue updated'
-        })
+        });
       });
     }
     else {
@@ -144,7 +153,7 @@ function BoardController($rootScope, $http, $timeout, _, dataService) {
         $ctrl.cancelEditing();
         $rootScope.$emit('alertOn', {
           class: 'success', text: 'Issue created'
-        })
+        });
 
       });
     }

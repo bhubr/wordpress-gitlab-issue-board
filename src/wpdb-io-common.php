@@ -117,16 +117,19 @@ function query_project_custom_terms( $taxonomy, $wp_project_id ) {
 	$term_ids = array_map( function( $meta ) {
 		return $meta->term_id;
 	}, $metas );
-	$where = empty( $term_ids ) ? '' : 'AND term_id IN (' . implode( ',', $term_ids ) . ')';
-	$term_tax_entries = $wpdb->get_results(
-		"SELECT term_id FROM {$wpdb->prefix}term_taxonomy WHERE taxonomy ='$taxonomy' $where"
-	);
-	$term_ids = array_map( function( $meta ) {
-		return $meta->term_id;
-	}, $term_tax_entries );
-	$where = empty( $term_ids ) ? '(0)' : '(' . implode( ',', $term_ids ) . ')';
+	$where = empty( $term_ids ) ? '' : 'AND tt.term_id IN (' . implode( ',', $term_ids ) . ')';
+	$fields = 'tt.term_id,tt.count,tt.description,t.name,t.slug,tt.taxonomy,tt.parent';
+	$tables = "{$wpdb->prefix}term_taxonomy tt INNER JOIN {$wpdb->prefix}terms t on tt.term_id=t.term_id";
 	$terms = $wpdb->get_results(
-		"SELECT * FROM {$wpdb->prefix}terms WHERE term_id IN $where", ARRAY_A
+		"SELECT $fields FROM $tables WHERE tt.taxonomy ='$taxonomy' $where", ARRAY_A
 	);
+	// $term_ids = array_map( function( $meta ) {
+	// 	return $meta->term_id;
+	// }, $term_tax_entries );
+	// $where = empty( $term_ids ) ? '(0)' : '(' . implode( ',', $term_ids ) . ')';
+	// $terms = $wpdb->get_results(
+	// 	"SELECT * FROM {$wpdb->prefix}terms WHERE term_id IN $where", ARRAY_A
+	// );
 	return $terms;
+
 }

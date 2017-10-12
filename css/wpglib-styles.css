@@ -136,3 +136,27 @@
   background: #eca;
   border: 1px solid #db9;
 }
+
+input.bare {
+  border-left: none;
+  border-top: none;
+  border-right: none;
+  border-bottom: 1px solid #ddd;
+  font-size: 12px;
+  background: #eee;
+}
+button.btn-bare {
+  background: #3a3;
+  border: 1px solid #3a3;
+  color: #fff;
+  border-radius: 3px;
+  font-size: 12px;
+  display: inline;
+  margin-left: 2px;
+}
+.inline {
+  display: inline;
+}
+.filters-actions {
+  margin-bottom: 8px;
+}

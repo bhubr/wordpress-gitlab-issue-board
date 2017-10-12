@@ -1,13 +1,15 @@
 <h2>Board</h2>
 
-<strong>Statuses:</strong> <span class="_pull-right">
-  <a href="#" ng-click="$ctrl.filterIssues('all')">All</a> |
-  <a href="#" ng-click="$ctrl.filterIssues('opened')">Opened</a> |
-  <a href="#" ng-click="$ctrl.filterIssues('closed')">Closed</a>
-</span>
-<strong>Actions:</strong> <span class="_pull-right">
-  <a href="#" ng-click="$ctrl.createCat()">Create list</a>
-</span>
+<div class="filters-actions">
+  <strong>Statuses:</strong> <span class="_pull-right">
+    <a href="#" ng-click="$ctrl.filterIssues('all')">All</a> |
+    <a href="#" ng-click="$ctrl.filterIssues('opened')">Opened</a> |
+    <a href="#" ng-click="$ctrl.filterIssues('closed')">Closed</a>
+  </span>
+  <strong>Create list:</strong> <span class="_pull-right">
+    <form class="inline" ng-submit="$ctrl.createList()"><input class="bare" ng-model="$ctrl.data.listName" /><button type="submit" class="btn-bare">Create list</button></form>
+  </span>
+</div>
 <div>
   <div class="board-list" ng-class="{ collapsed: cat._collapsed }" ng-repeat="cat in $ctrl.rootCats">
   <span class="expand-collapse" ng-click="cat._collapsed = ! cat._collapsed">{{ cat._collapsed ? '&raquo;' : '&laquo;' }}</span>

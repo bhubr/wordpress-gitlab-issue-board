@@ -124,8 +124,8 @@ function register_fields() {
 }
 
 function issue_cat_get_wp_project_id_field(  $object, $meta_key ) {
-	// var_dump(func_get_args());
-	return get_term_meta( $object['id'], $meta_key, true );
+	$wp_pid_meta = get_term_meta( $object['id'], $meta_key, true );
+	return empty( $wp_pid_meta ) ? null : (int) $wp_pid_meta;
 }
 
 function issue_cat_update_wp_project_id_field( $meta_value, $term, $meta_key ) {
@@ -180,6 +180,15 @@ function map_wp_post_fields( $record ) {
 	];
 }
 
+function map_wp_issue_term_fields( $record ) {
+	$record['count'] = (int) $record['count'];
+	$record['parent'] = (int) $record['parent'];
+	$record['id'] = (int) $record['term_id'];
+	unset( $record ['term_id'] );
+	$record['wp_project_id'] = issue_cat_get_wp_project_id_field( $record, 'wp_project_id' );
+	return $record;
+}
+
 function map_wp_post_fields_project( $record ) {
 	return array_merge(
 		map_wp_post_fields($record),
@@ -200,6 +209,10 @@ function map_wp_post_fields_issue( $record ) {
 			'gl_project_id' => get_post_meta( $record['ID'], 'gl_project_id', true )
 		]
 	);
+}
+
+function map_wp_issue_terms_fields( $records ) {
+	return array_map( '\\bhubr\\wp\\glib\\rest\\map_wp_issue_term_fields', $records );
 }
 
 
@@ -274,8 +287,8 @@ function get_board( \WP_REST_Request $request ) {
 
 	return new \WP_REST_Response( [
 		'issues' => $issues,
-		'issueCats' => $issue_cats,
-		'issueLabels' => $issue_labels
+		'issueCats' => map_wp_issue_terms_fields( $issue_cats ),
+		'issueLabels' => map_wp_issue_terms_fields( $issue_labels )
 	], 200 );
 }
 
