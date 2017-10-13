@@ -14,7 +14,7 @@ function setup() {
 	add_action('the_content', '\\bhubr\\wp\\glib\\rest\\disable_auto_paragraph', 8);
 }
 
-
+add_action('save_post', '\\bhubr\\wp\\glib\\rest\\save_issue_callback');
 
 /**
  * Disable automatic paragraph wrapping of content by WP
@@ -257,6 +257,9 @@ function sync_gitlab_projects_to_wp() {
 }
 
 function sync_gitlab_issues_to_wp( \WP_REST_Request $request ) {
+	global $disable_save_hook;
+	$disable_save_hook = true;
+
 	// 1. get issues
 	// 2. inject them in db
 	$params = $request->get_url_params();
@@ -325,4 +328,67 @@ function register_routes() {
         'methods' => 'POST',
         'callback' => '\\bhubr\\wp\\glib\\rest\\sync_gitlab_issues_to_wp'
     ));
+}
+
+function get_parsed_raw_body() {
+	$body_text = file_get_contents('php://input');
+	$body_json = json_decode( $body_text, true );
+	if( empty( $body_json ) ) {
+		throw new \Exception( 'not a json body ' . $_SERVER['REQUEST_METHOD'] . print_r( $body_text, true ) );
+	}
+	return $body_json;
+}
+
+function save_issue_callback( $post_id ) {
+	global $disable_save_hook;
+	if( $disable_save_hook ) {
+		return;
+	}
+	if( 'issue' !== get_post_type( $post_id ) ) {
+		return;
+	}
+	$post = get_post( $post_id );
+	if( $post->post_status !== 'publish' ) {
+		return;
+	}
+	// echo "parent: " . $post->post_parent . "\n";
+	// var_dump($_REQUEST);
+	$body = get_parsed_raw_body();
+	$post_parent_id = (int) $body['post_parent'];
+	$parent_project_post = get_post( $post_parent_id );
+	$gitlab_iid = $post->menu_order;
+	$client_wrapper = Gitlab_Issue_Board_API_Client::get_instance();
+	$client = $client_wrapper->get_client();
+	// var_dump($parent_project_post);
+	if( empty( $gitlab_iid ) ) {
+		try {
+			$new_issue = $client->api('issues')->create( $parent_project_post->comment_count, array(
+				'title'       => $post->post_title,
+				'description' => $post->post_content
+			) );
+			global $wpdb;
+			$query = $wpdb->prepare(
+				"UPDATE {$wpdb->prefix}posts SET comment_count=%d,menu_order=%d,post_parent=%d WHERE ID=%d",
+				$new_issue['id'], $new_issue['iid'], $post_parent_id, $post_id );
+			$wpdb->query( $query );
+
+			update_post_meta( $post_id, 'gl_project_id', $new_issue['project_id'] );
+			update_post_meta( $post_id, 'gl_state', $new_issue['state'] );
+		} catch( Exception $e ) {
+			header('HTTP/1.0 500 Internal Server Error');
+			die( 'Error 500 - ' . $e->getMessage() );
+		}
+
+	}
+	else {
+		try {
+			$client->api('issues')->update( $parent_project_post->comment_count, $gitlab_iid, array(
+				'title'       => $post->post_title,
+				'description' => $post->post_content
+			) );
+		} catch( Exception $e ) {
+			header('HTTP/1.0 500 Internal Server Error');
+			die( 'Error 500 - ' . $e->getMessage() );
+		}
+	}
 }

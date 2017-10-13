@@ -29,6 +29,9 @@ function UIRouterConfig(
       url: '/',
       component: 'board',
       resolve: {
+        projectId: function() {
+          return defaultProjectId;
+        },
         board: [
           'dataService', function(dataService) {
             return dataService.getBoard(defaultProjectId)

@@ -139,9 +139,10 @@ console.log('drop issue', issue);
     // set back the real title and desc properties
     issue.title = issue._title;
     issue.content = issue._description;
+    issue.post_parent = $ctrl.projectId;
     delete issue._title;
     delete issue._description;
-
+console.log('saving issue', issue);
     // save to backend
     if(issue.id) {
       dataService.updateResource('issue', issue)
